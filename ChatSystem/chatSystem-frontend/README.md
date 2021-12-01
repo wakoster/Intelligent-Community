@@ -1,4 +1,4 @@
-# chat_syetem-frontend
+# chat_system-frontend
 
 > My graduation project, chat component
 
