@@ -1,15 +1,35 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      redirect: '/chatSystem'
+    },
+    {
+      path: '/chatSystem',
+      name: 'homePage',
+      component: () => import('@/components'),
+      redirect: '/chatSystem/chat',
+      children: [{
+        path: 'chat',
+        name: 'chat',
+        component: () => import('@/components/chat')
+      },
+      {
+        path: 'contacts',
+        name: 'contacts',
+        component: () => import('@/components/contacts')
+      },
+      {
+        path: 'userInfo',
+        name: 'userInfo',
+        component: () => import('@/components/userInfo')
+      }]
     }
   ]
 })
