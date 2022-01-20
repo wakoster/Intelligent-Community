@@ -213,6 +213,7 @@ export default {
 
 .contactsList .contactTag::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
 .contactsList .contactTag::-webkit-scrollbar-thumb {

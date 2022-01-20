@@ -20,13 +20,13 @@
       <div class="informationBox">
         <div>邮箱地址:</div>
         <div class="inputBox">
-          <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写邮箱以接受系统邮件" v-model="userInfo.mailbox">
+          <input type="email" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写邮箱以接受系统邮件" v-model="userInfo.mailbox">
         </div>
       </div>
       <div class="informationBox">
         <div>电话号码:</div>
         <div class="inputBox">
-          <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写电话号码" v-model="userInfo.phoneNumber">
+          <input type="tel" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写电话号码" v-model="userInfo.phoneNumber">
         </div>
       </div>
       <div class="informationBox">
@@ -47,19 +47,19 @@
       <div class="informationBox">
         <div>旧密码:</div>
         <div class="inputBox">
-          <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请输入原密码" v-model="password.oldPassword">
+          <input type="password" @focus="activeLink($event)" @blur="clearActive()" placeholder="请输入原密码" v-model="password.oldPassword">
         </div>
       </div>
       <div class="informationBox">
         <div>新密码:</div>
         <div class="inputBox">
-          <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请输入新密码" v-model="password.newPassword">
+          <input type="password" @focus="activeLink($event)" @blur="clearActive()" placeholder="请输入新密码" v-model="password.newPassword">
         </div>
       </div>
       <div class="informationBox">
         <div>确认新密码:</div>
         <div class="inputBox">
-          <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请确认新密码" v-model="password.newPasswordAgain">
+          <input type="password" @focus="activeLink($event)" @blur="clearActive()" placeholder="请确认新密码" v-model="password.newPasswordAgain">
         </div>
         <div class="errorMessage" :class="{active: password.newPassword === password.newPasswordAgain}">两次输入不一致</div>
       </div>
@@ -175,6 +175,7 @@ export default {
 
 .userInfo::-webkit-scrollbar {
   width: 5px;
+  height: 5px;
 }
 
 .userInfo::-webkit-scrollbar-thumb {
