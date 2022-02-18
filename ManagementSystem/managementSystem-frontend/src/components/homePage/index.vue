@@ -1,6 +1,23 @@
 <template>
   <div class="homePage">
-    <div class="topbox"></div>
+    <div class="topbox">
+      <div class="name-wrap" onclick="document.querySelector('.name-wrap').classList.toggle('active')" tabindex="0" onblur="document.querySelector('.name-wrap.active') !== null?document.querySelector('.name-wrap.active').classList.toggle('active'):'无事发生'">
+        <span class="name">测试用户</span>
+        <div class="el-icon"></div>
+        <div class="info-area">
+          <ul>
+            <li @click="skipSettingPageLogin">
+              <span class="iconfont">&#xe633;</span>
+              <span>设置管理</span>
+            </li>
+            <li>
+              <span class="iconfont">&#xe75d;</span>
+              <span>退出</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <div class="tab-bar">
       <div class="tabBar-box" :class="{active: code === '0x0000'}" @click="code = '0x0000'">
         <label>导航页面</label>
@@ -20,7 +37,7 @@
           <div class="sites-box" v-for="sites in items.list" :key="sites.code" @click="openTabBar(sites)">
             <div class="sites-info">
               <!-- <img class="img" :src='sites.img'> -->
-              <img class="img" src='../../assets/logo.png'>
+              <img class="img" :src='sites.img'>
               <div class="label-box">
                 <label class="title">{{sites.title}}</label>
                 <label class="description">{{sites.description}}</label>
@@ -32,11 +49,14 @@
       </div>
     </div>
     <iframe class="iframe" :class="{hidden: items.code !== code}" :src="items.url" v-for="items in tabBar" :key="items.code"></iframe>
+    <error-message ref="errorMessage"></error-message>
   </div>
 </template>
 
 <script>
+import errorMessage from '../errorMessage.vue'
 export default {
+  components: { errorMessage },
   name: 'homePage',
   data: function () {
     return {
@@ -76,6 +96,13 @@ export default {
                 url: 'http://localhost:8080/login',
                 img: '',
                 description: '个人信息'
+              },
+              {
+                code: '0x5679',
+                title: '百度',
+                url: 'https://blog.csdn.net/qq_36527174/article/details/110873134',
+                img: '',
+                description: '百度'
               }
             ]
           }
@@ -93,6 +120,12 @@ export default {
         this.tabBar.push(item)
       }
       this.code = item.code
+    },
+    showErrorMessage (errorMessage) {
+      this.$refs.errorMessage.setErrorMessage(errorMessage)
+    },
+    skipSettingPageLogin (errorMessage) {
+      this.$router.push('/login?active=settingPage')
     }
   }
 }
@@ -102,9 +135,9 @@ export default {
 <style scoped="scoped">
 @font-face {
   font-family: 'iconfont';  /* Project id 3033470 */
-  src: url('//at.alicdn.com/t/font_3033470_ipppo9uuask.woff2?t=1642487649106') format('woff2'),
-       url('//at.alicdn.com/t/font_3033470_ipppo9uuask.woff?t=1642487649106') format('woff'),
-       url('//at.alicdn.com/t/font_3033470_ipppo9uuask.ttf?t=1642487649106') format('truetype');
+  src: url('//at.alicdn.com/t/font_3033470_5tpgbtlxvky.woff2?t=1644130815015') format('woff2'),
+       url('//at.alicdn.com/t/font_3033470_5tpgbtlxvky.woff?t=1644130815015') format('woff'),
+       url('//at.alicdn.com/t/font_3033470_5tpgbtlxvky.ttf?t=1644130815015') format('truetype');
 }
 
 .iconfont{
@@ -124,7 +157,93 @@ export default {
 .homePage .topbox{
   width: 100%;
   height: 40px;
-  background-color: rgb(0,110,255);
+  background-color: rgb(40, 140, 227);
+}
+
+.topbox .name-wrap{
+  position: absolute;
+  right: 20px;
+  height: 40px;
+  margin-right: 25px;
+  cursor: pointer;
+  display: flex;
+}
+
+.topbox .name{
+  font-family: Microsoft Yahei;
+  font-size: 18px;
+  color: #fff;
+  align-self: center;
+}
+
+.topbox .el-icon{
+  position: relative;
+  height: 20px;
+  align-self: center;
+  margin-left: 5px;
+}
+
+.topbox .el-icon:after,.topbox .el-icon:before{
+  border: 8px solid transparent;
+  border-top: 8px solid rgb(40, 140, 227);
+  position: absolute;
+  top: 4px;
+  content: ' ';
+}
+
+.topbox .el-icon:before {
+  border-top-color: #fff;
+  top: 7px;
+}
+
+.name-wrap.active .el-icon:after,.name-wrap.active .el-icon:before{
+  border: 8px solid transparent;
+  border-bottom: 8px solid #fff;
+  position: absolute;
+  top: 0px;
+  content: ' ';
+}
+
+.name-wrap.active .el-icon::after {
+  border-bottom-color: rgb(40, 140, 227);
+  top: 3px;
+}
+
+.name-wrap .info-area{
+  display: none;
+  position: absolute;
+  top: 50px;
+  font-size: 16px;
+  background: #fff;
+  color: #606266;
+  line-height: 40px;
+  width: 110px;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.name-wrap.active .info-area{
+  display: block;
+}
+
+.info-area li{
+  list-style-type:none;
+  border-radius: 5px;
+  display:flex;
+  padding: 0px 10px;
+}
+
+.info-area li:hover{
+  background-color: #f6f7f8;
+}
+
+.info-area .iconfont{
+  position: relative;
+  top: 3px;
+}
+
+.info-area span{
+  position: relative;
 }
 
 .homePage .tab-bar{
@@ -145,6 +264,8 @@ export default {
   display: flex;
   align-items: center;
   position: relative;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 .tabBar-box label{
@@ -160,7 +281,29 @@ export default {
 }
 
 .homePage .tabBar-box.active,.homePage .tabBar-box:hover{
-  background-color: rgba(0,110,255,0.098);
+  background-color: rgb(208,228,255);
+}
+
+.homePage .tabBar-box.active::before,.homePage .tabBar-box:hover:before{
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: -18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: -10px 10px 0 rgb(208,228,255);
+}
+
+.homePage .tabBar-box.active::after,.homePage .tabBar-box:hover:after{
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: -18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 10px 10px 0 rgb(208,228,255);
 }
 
 .tabBar-box .iconfont{
@@ -180,10 +323,11 @@ export default {
   border-width: 0px;
   position: fixed;
   bottom: 0px;
+  background-color: rgb(208,228,255);
 }
 
 .homePage .chooseIframe{
-  background-color: rgba(0,110,255,0.098);
+  background-color: rgb(208,228,255);
   overflow: auto;
 }
 

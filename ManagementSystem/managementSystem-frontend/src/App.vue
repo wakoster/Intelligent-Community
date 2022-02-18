@@ -16,7 +16,7 @@ export default {
     padding: 0;
   }
   html{
-    background-color: rgba(0,110,255,0.098);
+    background-color: rgb(230,240,255);
     font-family: PingFangSC-Regular, "PingFang SC";
     font-size: 14px;
   }

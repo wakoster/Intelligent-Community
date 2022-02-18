@@ -58,7 +58,7 @@ export default {
       this.$router.push('/homePage')
     },
     settingPage () {
-      this.$router.push('/settingPagePage')
+      this.$router.push('/settingPage')
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)

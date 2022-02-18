@@ -23,7 +23,13 @@ export default new Router({
     {
       path: '/settingPage',
       name: 'settingPage',
-      component: () => import('@/components/settingPage')
+      component: () => import('@/components/settingPage'),
+      redirect: '/settingPage/installationPackageManagement',
+      children: [{
+        path: 'installationPackageManagement',
+        name: 'installationPackageManagement',
+        component: () => import('@/components/settingPage/pages/installationPackageManagement.vue')
+      }]
     }
   ]
 })

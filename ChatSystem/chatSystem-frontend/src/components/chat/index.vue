@@ -47,10 +47,9 @@
             <button class="button" type="submit">发送</button>
           </div>
         </div>
-        <div class="userInfo">
-          <span class="iconfont" @click="showUserInfo">&#xe6d3;</span>
-          <div class="mask active" @click="showUserInfo"></div>
-          <div class="pop active">
+        <div class="userInfo"  tabindex="0" onblur="document.querySelector('.userInfo .pop.active') !== null?document.querySelector('.userInfo .pop.active').classList.toggle('active'):'无事发生'">
+          <span class="iconfont" onclick="document.querySelector('.userInfo .pop').classList.toggle('active')">&#xe6d3;</span>
+          <div class="pop">
             <img class="userImg" :src='userInformation.data.userImg'>
             <div class="userName">{{userInformation.data.userName}}</div>
             <div class="userId">编 号: {{userInformation.data.userId}}</div>
@@ -158,11 +157,6 @@ export default {
         var container = this.$el.querySelector('.session-window')
         container.scrollTop = container.scrollHeight
       })
-    },
-    showUserInfo () {
-      // 开关聊天信息显示
-      document.querySelector('.userInfo .mask').classList.toggle('active')
-      document.querySelector('.userInfo .pop').classList.toggle('active')
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)
@@ -547,20 +541,8 @@ export default {
   cursor: pointer;
 }
 
-.userInfo .mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1
-}
-
-.userInfo .mask.active {
-  display: none;
-}
-
 .userInfo .pop {
+  display: none;
   width: 170px;
   height: 170px;
   background-color: #FFFFFF;
@@ -574,7 +556,7 @@ export default {
 }
 
 .userInfo .pop.active {
-  display: none;
+  display: block;
 }
 
 .userInfo .userImg{
