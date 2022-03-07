@@ -16,14 +16,14 @@
       <div class="form-box" id='form-box'>
         <div class="settingPage-box hidden" id='settingPage-box'>
           <h1>settingPage</h1>
-          <input type="text" placeholder="用户名" />
-          <input type="password" placeholder="密码" />
+          <input type="text" placeholder="用户名"  v-model="phoneNumber"/>
+          <input type="password" placeholder="密码"  v-model="password"/>
           <button @click="settingPage">登录</button>
         </div>
         <div class="homePage-box" id='homePage-box'>
           <h1>homePage</h1>
-          <input type="text" placeholder="用户名" />
-          <input type="password" placeholder="密码" />
+          <input type="text" placeholder="用户名"  v-model="phoneNumber"/>
+          <input type="password" placeholder="密码"  v-model="password"/>
           <button @click="homePage">登录</button>
         </div>
       </div>
@@ -37,6 +37,12 @@ import errorMessage from '../errorMessage.vue'
 export default {
   components: { errorMessage },
   name: 'login',
+  data: function () {
+    return {
+      phoneNumber: '',
+      password: ''
+    }
+  },
   mounted: function () {
     // 判断是否是要登录管理界面
     if (this.$route.query.active === 'settingPage') {
@@ -55,10 +61,46 @@ export default {
       document.getElementById('form-box').style.transform = 'translateX(0%)'
     },
     homePage () {
-      this.$router.push('/homePage')
+      // homepage登录
+      this.$axios
+        .post('/loginConsumer', {
+          phoneNumber: this.phoneNumber,
+          password: this.$md5(this.password + 'KEY')
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.$router.push('/homepage')
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     settingPage () {
-      this.$router.push('/settingPage')
+      // settingPage登录
+      this.$axios
+        .post('/loginManager', {
+          phoneNumber: this.phoneNumber,
+          password: this.$md5(this.password + 'KEY')
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.$router.push('/settingPage')
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)

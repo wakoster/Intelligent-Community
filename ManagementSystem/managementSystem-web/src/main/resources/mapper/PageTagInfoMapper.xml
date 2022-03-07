@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduation.management.mapper.PageTagInfoMapper">
+    <resultMap id="BaseResultMap" type="com.graduation.management.dto.PageTagInfoDTO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="img" property="img" />
+        <result column="code" property="code" />
+        <result column="title" property="title" />
+        <result column="url" property="url" />
+        <result column="description" property="description" />
+        <result column="information" property="information" />
+        <result column="sort" property="sort" />
+    </resultMap>
+    <select id="selectPageTagInfo" resultMap="BaseResultMap" parameterType="com.graduation.management.dto.PageTagInfoDTO">
+        select * from page_tag_info
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="title != null and title != ''">
+                and title LIKE CONCAT(CONCAT('%',#{title},'%')) ESCAPE '/'
+            </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
+            <if test="description != null and description != ''">
+                and description LIKE CONCAT(CONCAT('%',#{description},'%')) ESCAPE '/'
+            </if>
+            <if test="information != null and information != ''">
+                and information LIKE CONCAT(CONCAT('%',#{information},'%')) ESCAPE '/'
+            </if>
+            <if test="sort != null and sort != ''">
+                and sort LIKE CONCAT(CONCAT('%',#{sort},'%')) ESCAPE '/'
+            </if>
+        </where>
+    </select>
+    <select id="selectPageTagInfoBySort" resultType="com.graduation.management.dto.PageTagInfoDTO">
+        select * from page_tag_info where sort=#{sort}
+    </select>
+    <update id="updatePageTagInfo" parameterType="com.graduation.management.dto.PageTagInfoDTO">
+        update page_tag_info
+        <set>
+            <if test="img != null and img != '' ">img=#{img},</if>
+            <if test="code != null and code != '' ">code=#{code},</if>
+            <if test="title != null and title != '' ">title=#{title},</if>
+            <if test="url != null and url != '' ">url=#{url},</if>
+            <if test="description != null and description != '' ">description=#{description},</if>
+            <if test="information != null and information != '' ">information=#{information},</if>
+            <if test="sort != null and sort != '' ">sort=#{sort},</if>
+            update_time = UNIX_TIMESTAMP(now())
+        </set>
+        where id=#{id}
+    </update>
+    <insert id="insertPageTagInfo">
+        insert into page_tag_info(
+            img, code, title, url,description,information,sort,create_time,update_time)
+        values (#{img},#{code},#{title},#{url},#{description},#{information},#{sort},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
+    </insert>
+    <delete id="deletePageTagInfoById">
+        delete from page_tag_info
+        where id = #{id};
+    </delete>
+</mapper>

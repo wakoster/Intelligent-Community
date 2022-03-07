@@ -3,6 +3,19 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+// 导入md5
+import md5 from 'js-md5'
+// 导入axios
+import axios from 'axios'
+
+// 将这个axios实例加载到Vue的原型上，以便随时可以访问
+const instance = axios.create({
+  baseURL: 'http://localhost:3762'
+})
+Vue.prototype.$axios = instance
+
+// 加载md5
+Vue.prototype.$md5 = md5
 
 Vue.config.productionTip = false
 

@@ -28,8 +28,8 @@
       </div>
     </div>
     <div class="chooseIframe" :class="{hidden: code !== '0x0000'}">
-      <div class="sites-list" v-for="items in pageList.list" :key="items.sort">
-        <div class="label">
+      <div class="sites-list" v-for="items in pageList.data" :key="items.sort">
+        <div class="label" v-if="items.sort !== '默认'">
           <span class="iconfont">&#xe87d;</span>
           {{items.sort}}
         </div>
@@ -43,7 +43,7 @@
                 <label class="description">{{sites.description}}</label>
               </div>
             </div>
-            <span class="tooltiptext">{{sites.description}}</span>
+            <span class="tooltiptext" v-if="sites.information !== null">{{sites.information}}</span>
           </div>
         </div>
       </div>
@@ -64,51 +64,58 @@ export default {
       tabBar: [
       ],
       pageList: {
-        code: 0,
-        msg: '成功!',
-        total: 2,
-        list: [
-          {
-            sort: '交流',
-            list: [
-              {
-                code: '0x5669',
-                title: '聊天界面',
-                url: 'http://localhost:8081/chatSystem/chat',
-                img: '',
-                description: '聊天'
-              },
-              {
-                code: '0x5671',
-                title: '聊天界面',
-                url: 'http://localhost:8081/chatSystem/userInfo',
-                img: '',
-                description: '聊天聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面'
-              }
-            ]
-          },
-          {
-            sort: '交流2',
-            list: [
-              {
-                code: '0x5670',
-                title: '个人信息',
-                url: 'http://localhost:8080/login',
-                img: '',
-                description: '个人信息'
-              },
-              {
-                code: '0x5679',
-                title: '百度',
-                url: 'https://blog.csdn.net/qq_36527174/article/details/110873134',
-                img: '',
-                description: '百度'
-              }
-            ]
-          }
-        ]
+        // code: 0,
+        // msg: '成功!',
+        // list: [
+        //   {
+        //     sort: '交流',
+        //     list: [
+        //       {
+        //         code: '0x5669',
+        //         title: '聊天界面',
+        //         url: 'http://localhost:8081/chatSystem/chat',
+        //         img: '',
+        //         description: '聊天',
+        //         information: '11'
+        //       },
+        //       {
+        //         code: '0x5671',
+        //         title: '聊天界面',
+        //         url: 'http://localhost:8081/chatSystem/userInfo',
+        //         img: '',
+        //         description: '聊天聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面',
+        //         information: null
+        //       }
+        //     ]
+        //   },
+        //   {
+        //     sort: '交流2',
+        //     list: [
+        //       {
+        //         code: '0x5670',
+        //         title: '个人信息',
+        //         url: 'http://localhost:8080/login',
+        //         img: '',
+        //         description: '个人信息',
+        //         information: '11'
+        //       },
+        //       {
+        //         code: '0x5679',
+        //         title: '百度',
+        //         url: 'https://blog.csdn.net/qq_36527174/article/details/110873134',
+        //         img: '',
+        //         description: '百度',
+        //         information: '11'
+        //       }
+        //     ]
+        //   }
+        // ]
       }
     }
+  },
+  mounted: function () {
+    // 获取页面标签
+    this.getPageTag()
   },
   methods: {
     closeTabBar (index) {
@@ -120,6 +127,25 @@ export default {
         this.tabBar.push(item)
       }
       this.code = item.code
+    },
+    getPageTag () {
+      // 页面标签
+      this.$axios
+        .get('/pageTag/getAllPageTag')
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.pageList = data
+            console.log(data)
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)
@@ -453,6 +479,7 @@ export default {
   transform: translateX(-50%);
   font-size: 12px;
   padding: 5px;
+  z-index: 1;
 }
 
 .sites-box:hover .tooltiptext {

@@ -23,7 +23,7 @@ export default {
       setTimeout(() => {
         el.style.transform = 'translate(-50%,calc(0px - 100%))'
         el.style.transition = 'all 1s ease'
-      }, 4000)
+      }, 2000)
     }
   }
 }
