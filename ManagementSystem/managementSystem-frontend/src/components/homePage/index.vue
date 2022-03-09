@@ -36,7 +36,6 @@
         <div class="sites">
           <div class="sites-box" v-for="sites in items.list" :key="sites.code" @click="openTabBar(sites)">
             <div class="sites-info">
-              <!-- <img class="img" :src='sites.img'> -->
               <img class="img" :src='sites.img'>
               <div class="label-box">
                 <label class="title">{{sites.title}}</label>

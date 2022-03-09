@@ -23,11 +23,11 @@
               <div class="versions">{{item.versions}}</div>
               <div class="operatingState">{{item.operatingState}}</div>
               <div class="operationBox">
-                <div class="operation" :class="{active: item.state == '未安装'}">安装</div>
-                <div class="operation" :class="{active: item.state == '已安装'}">卸载</div>
-                <div class="operation" :class="{active: item.state == '未安装'}">删除</div>
-                <div class="operation" :class="{active: item.operatingState != '正常运行'}">启动</div>
-                <div class="operation" :class="{active: item.operatingState == '正常运行'}">停止</div>
+                <div class="operation" :class="{active: item.state == '未安装'}" @click="test">安装</div>
+                <div class="operation" :class="{active: item.state == '已安装'}" @click="test">卸载</div>
+                <div class="operation" :class="{active: item.state == '未安装'}" @click="test">删除</div>
+                <div class="operation" :class="{active: item.operatingState != '正常运行'}" @click="test">启动</div>
+                <div class="operation" :class="{active: item.operatingState == '正常运行'}" @click="test">停止</div>
               </div>
               <div class="sign" v-if="item.sign" @click="sign(item.id),item.sign = !item.sign"><span class="iconfont">&#xe707;</span></div>
               <div class="sign" v-if="!item.sign" @click="sign(item.id),item.sign = !item.sign"><span class="iconfont">&#xe631;</span></div>
@@ -53,7 +53,7 @@
             <div class="record-type">{{item.type}}</div>
             <div class="record-name">{{item.name}}</div>
             <div class="record-info">{{item.info}}</div>
-            <div class="record-time">{{item.time}}</div>
+            <div class="record-time">{{formatDate(item.time)}}</div>
             <span class="iconfont">&#xe617;</span>
           </div>
           <div class="more" onclick="document.querySelector('.more').classList.add('hidden')">更多</div>
@@ -66,7 +66,6 @@
           <div class="formitem">
             <span>*</span>
             <label>工单分类</label>
-            <!-- <input placeholder="请输入工单标题" v-model=""> -->
             <div class="inputBox"><input placeholder="请输入工单标题"></div>
           </div>
           <div class="formitem">
@@ -94,11 +93,15 @@
         </div>
       </div>
     </div>
+    <error-message ref="errorMessage"></error-message>
   </div>
 </template>
 
 <script>
+import {getDate} from '../../../common/date.js'
+import errorMessage from '../../errorMessage.vue'
 export default {
+  components: { errorMessage },
   name: 'installationPackageManagement',
   data: function () {
     return {
@@ -117,14 +120,14 @@ export default {
             id: 1,
             name: 'chatSystem',
             type: '安装成功',
-            time: '2022-02-14 10:28',
+            time: 1646809494,
             info: ''
           },
           {
             id: 2,
             name: 'chatSystem',
             type: '安装失败',
-            time: '2022-02-14 10:28',
+            time: 1646809494000,
             info: '安装空间不足'
           }
         ]
@@ -168,6 +171,12 @@ export default {
     on_off_configuration () {
       document.querySelector('.configuration .pop').classList.toggle('active')
       document.querySelector('.configuration .mask').classList.toggle('active')
+    },
+    formatDate (time) {
+      return getDate(time.toString(), 'yyyy-MM-dd hh:mm:ss')
+    },
+    showErrorMessage (errorMessage) {
+      this.$refs.errorMessage.setErrorMessage(errorMessage)
     }
   }
 }
@@ -315,10 +324,11 @@ export default {
 
 .installationPackage .operation{
   margin: 0 10px;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .installationPackage .operation.active{
+  pointer-events: auto;
   cursor: pointer;
   color: #006eff;
 }
