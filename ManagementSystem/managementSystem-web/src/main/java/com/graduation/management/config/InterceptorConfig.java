@@ -30,7 +30,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
         patterns.add("/error");
         patterns.add("/loginConsumer");
         patterns.add("/loginManager");
+        
         patterns.add("/pageTag/**");
+        patterns.add("/logout");
         /**
          * 排除资源文件
          */

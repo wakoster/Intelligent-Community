@@ -56,6 +56,7 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = "/logout")
+    @ResponseBody
     public BaseResult logout(HttpSession session, HttpServletRequest request, HttpServletResponse response) {
         // 删除session里面的用户信息
         session.removeAttribute("userSession");

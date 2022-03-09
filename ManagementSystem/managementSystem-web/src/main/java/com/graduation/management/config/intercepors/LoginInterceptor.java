@@ -74,7 +74,7 @@ public class LoginInterceptor implements HandlerInterceptor {
          */
         HttpSession session = request.getSession();
         /**
-         * 5.如果cookie或session为空，重定向到登录界面
+         * 5.如果cookie或session为空或不相同，重定向到登录界面
          */
         if (StringUtils.isEmpty(cookie_username) || Objects.isNull(session.getAttribute("userSession"))) {
             response.sendRedirect(redirect);
@@ -88,6 +88,15 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.sendRedirect(redirect);
             return false;
         }
+        /**
+         * 7.更新cookie存活时间
+         */
+        Cookie cookie = new Cookie("cookie_username", cookie_username);
+        // 设置cookie的持久化时间
+        cookie.setMaxAge(2 * 60 * 60);
+        // 设置为当前项目下都携带这个cookie
+        cookie.setPath(request.getContextPath());
+        response.addCookie(cookie);
         return true;
     }
 

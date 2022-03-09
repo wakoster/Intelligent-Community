@@ -2,15 +2,15 @@
   <div class="homePage">
     <div class="topbox">
       <div class="name-wrap" onclick="document.querySelector('.name-wrap').classList.toggle('active')" tabindex="0" onblur="document.querySelector('.name-wrap.active') !== null?document.querySelector('.name-wrap.active').classList.toggle('active'):'无事发生'">
-        <span class="name">测试用户</span>
+        <span class="name">{{this.userName}}</span>
         <div class="el-icon"></div>
         <div class="info-area">
           <ul>
-            <li @click="skipSettingPageLogin">
+            <li @click="skipSettingPage">
               <span class="iconfont">&#xe633;</span>
               <span>设置管理</span>
             </li>
-            <li>
+            <li @click="logout">
               <span class="iconfont">&#xe75d;</span>
               <span>退出</span>
             </li>
@@ -61,61 +61,17 @@ export default {
   data: function () {
     return {
       code: '0x0000',
+      userName: '',
       tabBar: [
       ],
-      pageList: {
-        // code: 0,
-        // msg: '成功!',
-        // list: [
-        //   {
-        //     sort: '交流',
-        //     list: [
-        //       {
-        //         code: '0x5669',
-        //         title: '聊天界面',
-        //         url: 'http://localhost:8081/chatSystem/chat',
-        //         img: '',
-        //         description: '聊天',
-        //         information: '11'
-        //       },
-        //       {
-        //         code: '0x5671',
-        //         title: '聊天界面',
-        //         url: 'http://localhost:8081/chatSystem/userInfo',
-        //         img: '',
-        //         description: '聊天聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面聊天界面',
-        //         information: null
-        //       }
-        //     ]
-        //   },
-        //   {
-        //     sort: '交流2',
-        //     list: [
-        //       {
-        //         code: '0x5670',
-        //         title: '个人信息',
-        //         url: 'http://localhost:8080/login',
-        //         img: '',
-        //         description: '个人信息',
-        //         information: '11'
-        //       },
-        //       {
-        //         code: '0x5679',
-        //         title: '百度',
-        //         url: 'https://blog.csdn.net/qq_36527174/article/details/110873134',
-        //         img: '',
-        //         description: '百度',
-        //         information: '11'
-        //       }
-        //     ]
-        //   }
-        // ]
-      }
+      pageList: {}
     }
   },
   mounted: function () {
     // 获取页面标签
     this.getPageTag()
+    console.log(this.$cookies.get('cookie_username'))
+    this.userName = this.$cookies.get('cookie_username')
   },
   methods: {
     closeTabBar (index) {
@@ -138,7 +94,22 @@ export default {
           } = resp
           if (data.code === 0) {
             this.pageList = data
-            console.log(data)
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    logout () {
+      this.$axios.get('/logout')
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.$router.push('/login')
           } else {
             this.showErrorMessage(data.msg)
           }
@@ -150,8 +121,8 @@ export default {
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)
     },
-    skipSettingPageLogin (errorMessage) {
-      this.$router.push('/login?active=settingPage')
+    skipSettingPage () {
+      this.$router.push('/settingPage')
     }
   }
 }
@@ -239,6 +210,8 @@ export default {
   display: none;
   position: absolute;
   top: 50px;
+  right: 0px;
+  transform: translateX(30%);
   font-size: 16px;
   background: #fff;
   color: #606266;

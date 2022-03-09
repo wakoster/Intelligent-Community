@@ -81,13 +81,14 @@ public class UserServiceImpl implements UserService {
          */
         Cookie cookie = new Cookie("cookie_username", userInfo.getName());
         // 设置cookie的持久化时间
-        cookie.setMaxAge(24 * 60 * 60);
+        cookie.setMaxAge(2 * 60 * 60);
         // 设置为当前项目下都携带这个cookie
         cookie.setPath(request.getContextPath());
         /**
          * 9.向客户端发送cookie
          */
         response.addCookie(cookie);
+        response.addCookie(new Cookie("cookie", userInfo.getPhoneNumber()));
 
         return BaseResult.SUCCESS(null);
     }

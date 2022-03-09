@@ -7,6 +7,8 @@ import router from './router'
 import md5 from 'js-md5'
 // 导入axios
 import axios from 'axios'
+// 导入cookie
+import VueCookies from 'vue-cookies'
 
 // 将这个axios实例加载到Vue的原型上，以便随时可以访问
 const instance = axios.create({
@@ -18,6 +20,8 @@ Vue.prototype.$axios = instance
 Vue.prototype.$md5 = md5
 
 Vue.config.productionTip = false
+
+Vue.use(VueCookies)
 
 /* eslint-disable no-new */
 new Vue({
