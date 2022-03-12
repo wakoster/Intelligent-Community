@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduation.management.mapper.InstallationSignInfoMapper">
+    <resultMap id="BaseResultMap" type="com.graduation.management.dto.InstallationSignInfoDTO">
+        <result column="user_info_id" property="userInfoId" />
+        <result column="installation_package_id" property="installationPackageId" />
+        <result column="sign" property="sign" />
+    </resultMap>
+    <select id="selectInstallationSignInfo" resultMap="BaseResultMap" parameterType="com.graduation.management.dto.InstallationSignInfoDTO">
+        select * from installation_sign_info
+        <where>
+            <if test="userInfoId != null">
+                and user_info_id = #{userInfoId}
+            </if>
+            <if test="installationPackageId != null">
+                and installation_package_id = #{installationPackageId}
+            </if>
+            <if test="sign != null">
+                and sign = #{sign}
+            </if>
+        </where>
+    </select>
+    <select id="selectInstallationSignInfoByUserAndPackage" resultMap="BaseResultMap">
+        select * from installation_sign_info where user_info_id = #{userId} and installation_package_id = #{installationPackageId}
+    </select>
+    <update id="updateInstallationSignInfo" parameterType="com.graduation.management.dto.InstallationSignInfoDTO">
+        update installation_sign_info
+        <set>
+            <if test="sign != null">sign=#{sign},</if>
+        </set>
+        where user_info_id = #{userInfoId} and installation_package_id = #{installationPackageId};
+    </update>
+    <insert id="insertInstallationSignInfo">
+        insert into installation_sign_info(
+            user_info_id, installation_package_id, sign)
+        values (#{userInfoId},#{installationPackageId},#{sign})
+    </insert>
+    <delete id="deleteInstallationSignInfoById">
+        delete from installation_sign_info
+        where user_info_id = #{userInfoId} and installation_package_id = #{installationPackageId};
+    </delete>
+</mapper>

@@ -32,7 +32,7 @@ public class InstallationPackage {
      * 安装包文件
      */
     @Column(nullable = false,columnDefinition = "LONGBLOB")
-    private String installation_package;
+    private byte[] installation_package;
 
     /**
      * 名称
@@ -45,39 +45,39 @@ public class InstallationPackage {
      */
     @Column(nullable = false)
     @ColumnDefault("1")
-    private String major_version_number;
+    private Long major_version_number;
 
     /**
      * 子版本号
      */
     @Column(nullable = false)
     @ColumnDefault("0")
-    private String minor_version_number;
+    private Long minor_version_number;
 
     /**
      * 修正版本号
      */
     @Column(nullable = false)
     @ColumnDefault("0")
-    private String revision_version_number;
+    private Long revision_version_number;
 
     /**
      * 状态
      */
     @Column(nullable = false)
-    @ColumnDefault("0")
-    private Long state;
+    @ColumnDefault("'未安装'")
+    private String state;
 
     /**
      * 操作状态
      */
     @Column(nullable = false)
-    @ColumnDefault("0")
-    private Long operatingState;
+    @ColumnDefault("'未安装'")
+    private String operating_state;
 
     /**
      * 页面设置编号
      */
     @OneToOne(cascade = CascadeType.ALL)
-    private PageTagInfo pageTagInfo;
+    private PageTagInfo page_tag_info;
 }

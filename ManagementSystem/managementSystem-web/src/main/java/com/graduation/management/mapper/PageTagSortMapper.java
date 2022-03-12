@@ -9,28 +9,28 @@ import java.util.List;
 @Mapper
 public interface PageTagSortMapper {
     /**
-    * 根据条件查询用户
+    * 根据条件查询页面标签
     * @param pageTagSortDTO
     * @return
     */
     List<PageTagSortDTO> selectPageTagSort(PageTagSortDTO pageTagSortDTO);
 
     /**
-     * 更新图片标注信息
+     * 更新页面标签
      * @param pageTagSortDTO
      * @return
      */
     Integer updatePageTagSort(PageTagSortDTO pageTagSortDTO);
 
     /**
-     * 插入图片标注信息
+     * 插入页面标签
      * @param pageTagSortDTO
      * @return
      */
     Integer insertPageTagSort(PageTagSortDTO pageTagSortDTO);
 
     /**
-     * 删除图片标注信息
+     * 删除页面标签
      * @param id
      * @return
      */

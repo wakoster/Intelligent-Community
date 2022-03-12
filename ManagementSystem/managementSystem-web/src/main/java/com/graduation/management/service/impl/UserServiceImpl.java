@@ -14,10 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,19 +37,19 @@ public class UserServiceImpl implements UserService {
         /**
          * 3.查询用户
          */
-        List<UserInfoDTO> userInfos = null;
+        List<UserInfoDTO> userInfoDTOList = new ArrayList<>();
         try {
-            userInfos = userInfoMapper.selectUserInfo(userInfo);
+            userInfoDTOList = userInfoMapper.selectUserInfo(userInfo);
         } catch(Exception e){
             return BaseResult.FAIL((long) -1,e.getMessage(),null);
         }
         /**
          * 4.验证用户是否存在
          */
-        if(Objects.isNull(userInfos) || userInfos.size() == 0){
+        if(Objects.isNull(userInfoDTOList) || userInfoDTOList.size() == 0){
             return BaseResult.FAIL((long) -1,"账号不存在",null);
         }
-        userInfo = userInfos.get(0);
+        userInfo = userInfoDTOList.get(0);
         /**
          * 5.验证密码
          * md5加密，盐：KEY

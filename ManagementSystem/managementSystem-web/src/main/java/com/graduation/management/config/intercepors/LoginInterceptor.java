@@ -31,6 +31,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             put("/settingPage", AccessAuthorityEnum.ONLY_MANAGER);
             put("/logout", AccessAuthorityEnum.DEFAULT_ACCESS);
             put("/pageTag", AccessAuthorityEnum.DEFAULT_ACCESS);
+            put("/installationPackage", AccessAuthorityEnum.ONLY_MANAGER);
         }
     };
 
@@ -43,7 +44,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String redirect;
         String fullPath = request.getServletPath();
         String path = "/" + request.getServletPath().split("/")[1];
-        if(authority.get(path) == AccessAuthorityEnum.ONLY_MANAGER || authority.get(fullPath) == AccessAuthorityEnum.ONLY_MANAGER){
+        if((Objects.isNull(authority.get(fullPath)) ? authority.get(path) : authority.get(fullPath)) == AccessAuthorityEnum.ONLY_MANAGER){
             redirect = "/login?active=settingPage";
         }else {
             redirect = "/login";
@@ -84,7 +85,7 @@ public class LoginInterceptor implements HandlerInterceptor {
          * 6.判断访问权限
          */
         Map map = (Map) session.getAttribute("userSession");
-        if((Long)map.get("type") != 0 && (authority.get(request.getServletPath()).getCode() & (Long)map.get("type")) == 0){
+        if((Long)map.get("type") != 0 && (Objects.isNull(authority.get(fullPath)) ? authority.get(path).getCode() & (Long)map.get("type") : authority.get(fullPath).getCode() & (Long)map.get("type")) == 0){
             response.sendRedirect(redirect);
             return false;
         }

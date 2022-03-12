@@ -33,6 +33,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         
         patterns.add("/pageTag/**");
         patterns.add("/logout");
+        patterns.add("/installationPackage/**");
         /**
          * 排除资源文件
          */

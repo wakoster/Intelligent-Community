@@ -17,20 +17,20 @@
     <div class="box">
       <div class="left-box">
         <div class="installationPackage">
-          <div class="installationPackageBlock" v-for="item in installationPackage.list" :key="item.id">
+          <div class="installationPackageBlock" v-for="(item,index)  in installationPackage.data" :key="item.id">
             <div class="selectBlock" v-if="(installationPackageScreeningCondition.sign == null || installationPackageScreeningCondition.sign == item.sign) && (installationPackageScreeningCondition.state == null || installationPackageScreeningCondition.state == item.state)">
               <div class="name" @click="on_off_configuration">{{item.name}}</div>
               <div class="versions">{{item.versions}}</div>
               <div class="operatingState">{{item.operatingState}}</div>
               <div class="operationBox">
-                <div class="operation" :class="{active: item.state == '未安装'}" @click="test">安装</div>
-                <div class="operation" :class="{active: item.state == '已安装'}" @click="test">卸载</div>
-                <div class="operation" :class="{active: item.state == '未安装'}" @click="test">删除</div>
-                <div class="operation" :class="{active: item.operatingState != '正常运行'}" @click="test">启动</div>
-                <div class="operation" :class="{active: item.operatingState == '正常运行'}" @click="test">停止</div>
+                <div class="operation" :class="{active: item.state == '未安装'}">安装</div>
+                <div class="operation" :class="{active: item.state == '已安装'}">卸载</div>
+                <div class="operation" :class="{active: item.state == '未安装'}">删除</div>
+                <div class="operation" :class="{active: item.operatingState != '正常运行'}">启动</div>
+                <div class="operation" :class="{active: item.operatingState == '正常运行'}">停止</div>
               </div>
-              <div class="sign" v-if="item.sign" @click="sign(item.id),item.sign = !item.sign"><span class="iconfont">&#xe707;</span></div>
-              <div class="sign" v-if="!item.sign" @click="sign(item.id),item.sign = !item.sign"><span class="iconfont">&#xe631;</span></div>
+              <div class="sign" v-if="item.sign" @click="sign(item,index)"><span class="iconfont">&#xe707;</span></div>
+              <div class="sign" v-if="!item.sign" @click="sign(item,index)"><span class="iconfont">&#xe631;</span></div>
             </div>
           </div>
         </div>
@@ -132,41 +132,60 @@ export default {
           }
         ]
       },
-      installationPackage: {
-        code: 0,
-        msg: '成功!',
-        total: 2,
-        list: [
-          {
-            id: 1,
-            name: 'chatSystem',
-            versions: '1.0.0',
-            state: '已安装',
-            operatingState: '正常运行',
-            sign: true
-          },
-          {
-            id: 2,
-            name: 'facesSystem',
-            versions: '1.0.0',
-            state: '未安装',
-            operatingState: '已停止',
-            sign: false
-          }
-        ]
-      },
+      installationPackage: {},
       installationPackageScreeningCondition: {
         state: null,
         sign: null
       }
     }
   },
+  mounted: function () {
+    // 获取安装包信息
+    this.getInstallationPackage()
+  },
   methods: {
     changeInstallationPackageScreeningCondition (state, sign) {
       this.installationPackageScreeningCondition.state = state
       this.installationPackageScreeningCondition.sign = sign
     },
-    sign (id) {
+    getInstallationPackage () {
+      // 获取安装包信息
+      this.$axios
+        .get('/installationPackage/getAllInstallationPackage')
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.installationPackage = data
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    sign (item, index) {
+      // 修改关注信息
+      this.$axios
+        .post('/installationPackage/changeSignInfo', {
+          installationPackageId: item.id,
+          sign: !item.sign
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.installationPackage.data[index].sign = !this.installationPackage.data[index].sign
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     on_off_configuration () {
       document.querySelector('.configuration .pop').classList.toggle('active')

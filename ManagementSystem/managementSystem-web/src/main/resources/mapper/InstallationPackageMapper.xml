@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduation.management.mapper.InstallationPackageMapper">
+    <resultMap id="BaseResultMap" type="com.graduation.management.dto.InstallationPackageDTO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="installation_package" property="installationPackage" />
+        <result column="name" property="name" />
+        <result column="major_version_number" property="majorVersionNumber" />
+        <result column="minor_version_number" property="minorVersionNumber" />
+        <result column="revision_version_number" property="revisionVersionNumber" />
+        <result column="state" property="state" />
+        <result column="operating_state" property="operatingState" />
+        <result column="page_tag_info_id" property="pageTagInfoId" />
+    </resultMap>
+    <select id="selectInstallationPackage" resultMap="BaseResultMap" parameterType="com.graduation.management.dto.InstallationPackageDTO">
+        select * from installation_package
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="majorVersionNumber != null">
+                and major_version_number = #{majorVersionNumber}
+            </if>
+            <if test="minorVersionNumber != null">
+                and minor_version_number = #{minorVersionNumber}
+            </if>
+            <if test="revisionVersionNumber != null">
+                and revision_version_number = #{revisionVersionNumber}
+            </if>
+            <if test="state != null and state != ''">
+                and state = #{state}
+            </if>
+            <if test="operatingState != null and operatingState != ''">
+                and operating_state = #{operatingState}
+            </if>
+            <if test="pageTagInfoId != null">
+                and page_tag_info_id = #{pageTagInfoId}
+            </if>
+        </where>
+    </select>
+    <update id="updateInstallationPackage" parameterType="com.graduation.management.dto.InstallationPackageDTO">
+        update installation_package
+        <set>
+            <if test="installationPackage != null and installationPackage != '' ">installation_package=#{installationPackage},</if>
+            <if test="name != null and name != '' ">name=#{name},</if>
+            <if test="majorVersionNumber != null">major_version_number=#{majorVersionNumber},</if>
+            <if test="minorVersionNumber != null">minor_version_number=#{minorVersionNumber},</if>
+            <if test="revisionVersionNumber != null">revision_version_number=#{revisionVersionNumber},</if>
+            <if test="state != null and state != '' ">state=#{state},</if>
+            <if test="operatingState != null and operatingState != '' ">operating_state=#{operatingState},</if>
+            <if test="pageTagInfoId != null">page_tag_info=#{pageTagInfoId},</if>
+            update_time = UNIX_TIMESTAMP(now())
+        </set>
+        where id=#{id}
+    </update>
+    <insert id="insertInstallationPackage">
+        insert into installation_package(
+            installation_package, name, major_version_number, minor_version_number,revision_version_number,state,operating_state,page_tag_info,create_time,update_time)
+        values (#{installationPackage},#{name},#{majorVersionNumber},#{minorVersionNumber},#{revisionVersionNumber},#{state},#{operatingState},#{pageTagInfoId},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
+    </insert>
+    <delete id="deleteInstallationPackageById">
+        delete from installation_package
+        where id = #{id};
+    </delete>
+</mapper>

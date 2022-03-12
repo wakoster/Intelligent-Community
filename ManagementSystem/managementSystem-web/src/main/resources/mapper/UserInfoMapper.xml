@@ -38,7 +38,7 @@
             <if test="sign != null and sign != ''">
                 and sign LIKE CONCAT(CONCAT('%',#{sign},'%')) ESCAPE '/'
             </if>
-            <if test="type != null and type != ''">
+            <if test="type != null">
                 and type = #{type}
             </if>
         </where>
@@ -51,6 +51,7 @@
             <if test="mailbox != null and mailbox != '' ">mailbox=#{mailbox},</if>
             <if test="address != null and address != '' ">address=#{address},</if>
             <if test="sign != null and sign != '' ">sign=#{sign},</if>
+            <if test="type != null and type != '' ">type=#{type},</if>
             update_time = UNIX_TIMESTAMP(now())
         </set>
         where id=#{id}

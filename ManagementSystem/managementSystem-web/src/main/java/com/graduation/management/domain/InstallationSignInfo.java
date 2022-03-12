@@ -13,32 +13,32 @@ import java.io.Serializable;
 @Data
 @Entity
 @IdClass(InstallationSignInfo.InstallationSignInfoUPK.class)
-public class InstallationSignInfo implements Serializable{
+public class InstallationSignInfo{
     /**
      * 用户编号
      */
     @Id
     @ManyToOne(cascade = CascadeType.ALL)
-    private UserInfo userInfo;
+    private UserInfo user_info;
 
     /**
      * 安装包编号
      */
     @Id
     @ManyToOne(cascade = CascadeType.ALL)
-    private InstallationPackage installationPackage;
+    private InstallationPackage installation_package;
 
     /**
      * 标注sign信息
      */
     @Column(nullable = false)
-    @ColumnDefault("0")
-    private Long sign;
+    @ColumnDefault("false")
+    private Boolean sign;
 
     @Data
     static class InstallationSignInfoUPK implements Serializable {
-        private UserInfo userInfo;
-        private InstallationPackage installationPackage;
+        private UserInfo user_info;
+        private InstallationPackage installation_package;
     }
 }
 

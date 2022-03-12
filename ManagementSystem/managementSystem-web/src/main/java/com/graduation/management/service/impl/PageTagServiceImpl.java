@@ -29,9 +29,9 @@ public class PageTagServiceImpl implements PageTagService {
         /**
          * 1.查询所有页面标签的分类信息
          */
-        List<PageTagSortDTO> pageTagSorts = null;
+        List<PageTagSortDTO> pageTagSortDTOList = new ArrayList<>();
         try{
-            pageTagSorts = pageTagSortMapper.selectPageTagSort(new PageTagSortDTO());
+            pageTagSortDTOList = pageTagSortMapper.selectPageTagSort(new PageTagSortDTO());
         }catch (Exception e){
             return BaseResult.FAIL((long) -1,e.getMessage(),null);
         }
@@ -39,40 +39,40 @@ public class PageTagServiceImpl implements PageTagService {
          * 2.通过页面标签的分类信息查询页面标签
          */
         List<HashMap<String,Object>> result = new ArrayList<>();
-        List<PageTagInfoDTO> pageTagInfoDTOS = null;
+        List<PageTagInfoDTO> pageTagInfoDTOList = new ArrayList<>();
         HashMap<String,Object> map = new HashMap();
         /**
          * 2-1.先查询没有sort的页面标签
          */
         try {
-            pageTagInfoDTOS = pageTagInfoMapper.selectPageTagInfoBySort("默认");
+            pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfoBySort("默认");
         }catch (Exception e){
             return BaseResult.FAIL((long) -1,e.getMessage(),null);
         }
         /**
          * 2-2按前端需要封装
          */
-        if(Objects.nonNull(pageTagInfoDTOS) && !pageTagInfoDTOS.isEmpty()){
+        if(Objects.nonNull(pageTagInfoDTOList) && !pageTagInfoDTOList.isEmpty()){
             map.put("sort","默认");
-            map.put("list",pageTagInfoDTOS);
+            map.put("list",pageTagInfoDTOList);
             result.add(map);
         }
-        for(PageTagSortDTO pageTagSortDTO : pageTagSorts){
+        for(PageTagSortDTO pageTagSortDTO : pageTagSortDTOList){
             map = new HashMap();
             /**
              * 2-3.再查询有sort的页面标签
              */
             try {
-                pageTagInfoDTOS = pageTagInfoMapper.selectPageTagInfoBySort(pageTagSortDTO.getSort());
+                pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfoBySort(pageTagSortDTO.getSort());
             }catch (Exception e){
                 return BaseResult.FAIL((long) -1,e.getMessage(),null);
             }
             /**
              * 2-4按前端需要封装
              */
-            if(Objects.nonNull(pageTagInfoDTOS) && !pageTagInfoDTOS.isEmpty()) {
+            if(Objects.nonNull(pageTagInfoDTOList) && !pageTagInfoDTOList.isEmpty()) {
                 map.put("sort", pageTagSortDTO.getSort());
-                map.put("list", pageTagInfoDTOS);
+                map.put("list", pageTagInfoDTOList);
             }
             result.add(map);
         }
