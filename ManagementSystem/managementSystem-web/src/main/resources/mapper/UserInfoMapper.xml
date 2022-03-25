@@ -66,8 +66,4 @@
             phone_number, password, name, user_img,create_time,update_time,mailbox,address,sign,type)
         values (#{phoneNumber},#{password},#{name},#{userImg},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()),#{mailbox},#{address},#{sign},#{type})
     </insert>
-    <delete id="deleteUserInfoById">
-        delete from user_info
-        where id = #{id};
-    </delete>
 </mapper>

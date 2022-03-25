@@ -67,4 +67,11 @@ public class PageTagInfo {
      */
     @ColumnDefault("'默认'")
     private String sort;
+
+    /**
+     * 是否显示
+     */
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean is_show;
 }

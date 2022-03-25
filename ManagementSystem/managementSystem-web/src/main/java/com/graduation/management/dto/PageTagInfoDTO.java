@@ -57,4 +57,9 @@ public class PageTagInfoDTO {
      * 标签类别
      */
     private String sort;
+
+    /**
+     * 是否显示
+     */
+    private String isShow;
 }

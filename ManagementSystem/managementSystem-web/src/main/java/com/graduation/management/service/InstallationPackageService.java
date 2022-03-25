@@ -1,6 +1,7 @@
 package com.graduation.management.service;
 
 import com.graduation.management.result.BaseResult;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,4 +17,34 @@ public interface InstallationPackageService {
      * @return
      */
     BaseResult changeSignInfo(Long installationPackageId,HttpSession session,Boolean sign);
+
+    /**
+     * 查找可见的安装包操作记录(is_show = true)
+     * @return
+     */
+    BaseResult selectOperatingRecord(Integer rows);
+
+    /**
+     * 设置安装包操作记录为不可见(is_show = true)
+     * @return
+     */
+    BaseResult deleteOperatingRecord(Long id);
+
+    /**
+     * 上传安装包
+     * @return
+     */
+    BaseResult uploadInstallationPackage(MultipartFile installationPackage);
+
+    /**
+     * 删除安装包
+     * @return
+     */
+    BaseResult deleteInstallationPackage(Long id);
+
+    /**
+     * 设置安装包与页面标签的关联
+     * @return
+     */
+    BaseResult setPageTagInfoId(Long pageTagInfoId,Long installationPackageId);
 }

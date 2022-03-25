@@ -25,7 +25,7 @@ public class InstallationPackageDTO {
     /**
      * 安装包文件
      */
-    private byte[] installationPackage;
+    private String installationPackage;
 
     /**
      * 名称

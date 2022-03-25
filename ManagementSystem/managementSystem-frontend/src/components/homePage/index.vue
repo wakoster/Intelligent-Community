@@ -69,7 +69,6 @@ export default {
   mounted: function () {
     // 获取页面标签
     this.getPageTag()
-    console.log(this.$cookies.get('cookie_username'))
     this.userName = this.$cookies.get('cookie_username')
   },
   methods: {

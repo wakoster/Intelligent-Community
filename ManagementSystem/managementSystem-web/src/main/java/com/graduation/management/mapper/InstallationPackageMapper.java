@@ -15,6 +15,13 @@ public interface InstallationPackageMapper {
     List<InstallationPackageDTO> selectInstallationPackage(InstallationPackageDTO installationPackageDTO);
 
     /**
+     * 根据id查询安装包
+     * @param id
+     * @return
+     */
+    InstallationPackageDTO selectInstallationPackageById(Long id);
+
+    /**
      * 更新安装包
      * @param installationPackageDTO
      * @return

@@ -35,11 +35,4 @@ public interface UserInfoMapper {
      * @return
      */
     Integer insertUserInfo(UserInfoDTO userInfoDTO);
-
-    /**
-     * 删除用户信息
-     * @param id
-     * @return
-     */
-    Integer deleteUserInfoById(Long id);
 }

@@ -1,6 +1,5 @@
 package com.graduation.management.service.impl;
 
-import com.graduation.management.domain.PageTagSort;
 import com.graduation.management.dto.PageTagInfoDTO;
 import com.graduation.management.dto.PageTagSortDTO;
 import com.graduation.management.mapper.PageTagInfoMapper;
@@ -33,7 +32,7 @@ public class PageTagServiceImpl implements PageTagService {
         try{
             pageTagSortDTOList = pageTagSortMapper.selectPageTagSort(new PageTagSortDTO());
         }catch (Exception e){
-            return BaseResult.FAIL((long) -1,e.getMessage(),null);
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
         /**
          * 2.通过页面标签的分类信息查询页面标签
@@ -47,7 +46,7 @@ public class PageTagServiceImpl implements PageTagService {
         try {
             pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfoBySort("默认");
         }catch (Exception e){
-            return BaseResult.FAIL((long) -1,e.getMessage(),null);
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
         /**
          * 2-2按前端需要封装
@@ -65,7 +64,7 @@ public class PageTagServiceImpl implements PageTagService {
             try {
                 pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfoBySort(pageTagSortDTO.getSort());
             }catch (Exception e){
-                return BaseResult.FAIL((long) -1,e.getMessage(),null);
+                return BaseResult.ERROR((long) -1,e.getMessage(),null);
             }
             /**
              * 2-4按前端需要封装
@@ -76,7 +75,40 @@ public class PageTagServiceImpl implements PageTagService {
             }
             result.add(map);
         }
-
         return BaseResult.SUCCESS(result);
+    }
+
+    @Override
+    public BaseResult getPageTagInfoById(Long id) {
+        PageTagInfoDTO pageTagInfoDTO = new PageTagInfoDTO();
+        pageTagInfoDTO.setId(id);
+        try {
+            return BaseResult.SUCCESS(pageTagInfoMapper.selectPageTagInfo(pageTagInfoDTO));
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+    }
+
+    @Override
+    public BaseResult getPageTagSort() {
+        /**
+         * 查询所有页面标签的分类信息
+         */
+        try{
+            return BaseResult.SUCCESS(pageTagSortMapper.selectPageTagSort(new PageTagSortDTO()));
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+    }
+
+    @Override
+    public BaseResult setPageTagInfo(PageTagInfoDTO pageTagInfoDTO) {
+        Long pageTagInfoId;
+        try{
+            pageTagInfoId = pageTagInfoMapper.insertPageTagInfo(pageTagInfoDTO);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(pageTagInfoId);
     }
 }

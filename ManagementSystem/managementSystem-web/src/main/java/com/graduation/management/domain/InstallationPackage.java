@@ -31,8 +31,7 @@ public class InstallationPackage {
     /**
      * 安装包文件
      */
-    @Column(nullable = false,columnDefinition = "LONGBLOB")
-    private byte[] installation_package;
+    private String installation_package;
 
     /**
      * 名称

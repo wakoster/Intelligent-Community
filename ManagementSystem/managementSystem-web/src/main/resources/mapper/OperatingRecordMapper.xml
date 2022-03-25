@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduation.management.mapper.OperatingRecordMapper">
+    <resultMap id="BaseResultMap" type="com.graduation.management.dto.OperatingRecordDTO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="installation_package_id" property="installationPackageId" />
+        <result column="type" property="type" />
+        <result column="info" property="info" />
+        <result column="is_show" property="isShow" />
+        <result column="user_info_id" property="userInfoId" />
+    </resultMap>
+    <select id="selectOperatingRecord" resultMap="BaseResultMap">
+        select * from operating_record
+        <where>
+            <if test="operatingRecordDTO.id != null">
+                and id = #{operatingRecordDTO.id}
+            </if>
+            <if test="operatingRecordDTO.installationPackageId != null">
+                and installation_package_id = #{operatingRecordDTO.installationPackageId}
+            </if>
+            <if test="operatingRecordDTO.type != null and operatingRecordDTO.type != ''">
+                and type = #{operatingRecordDTO.type}
+            </if>
+            <if test="operatingRecordDTO.info != null and operatingRecordDTO.info != ''">
+                and info = #{operatingRecordDTO.info}
+            </if>
+            <if test="operatingRecordDTO.isShow != null">
+                and is_show = #{operatingRecordDTO.isShow}
+            </if>
+            <if test="operatingRecordDTO.userInfoId != null">
+                and user_info_id = #{operatingRecordDTO.userInfoId}
+            </if>
+        </where>
+        order by id desc
+        limit #{rows}
+    </select>
+    <insert id="insertOperatingRecord">
+        insert into operating_record(
+            installation_package_id, type, info,user_info_id,create_time,update_time)
+        values (#{installationPackageId},#{type},#{info},#{userInfoId},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
+    </insert>
+    <update id="hideOperatingRecordById">
+        update operating_record
+            set is_show = false ,update_time = UNIX_TIMESTAMP(now())
+        where id=#{id}
+    </update>
+</mapper>

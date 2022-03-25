@@ -43,6 +43,9 @@
             </if>
         </where>
     </select>
+    <select id="selectInstallationPackageById" resultMap="BaseResultMap">
+        select * from installation_package where id = #{id}
+    </select>
     <update id="updateInstallationPackage" parameterType="com.graduation.management.dto.InstallationPackageDTO">
         update installation_package
         <set>
@@ -53,18 +56,19 @@
             <if test="revisionVersionNumber != null">revision_version_number=#{revisionVersionNumber},</if>
             <if test="state != null and state != '' ">state=#{state},</if>
             <if test="operatingState != null and operatingState != '' ">operating_state=#{operatingState},</if>
-            <if test="pageTagInfoId != null">page_tag_info=#{pageTagInfoId},</if>
+            <if test="pageTagInfoId != null">page_tag_info_id=#{pageTagInfoId},</if>
             update_time = UNIX_TIMESTAMP(now())
         </set>
         where id=#{id}
     </update>
     <insert id="insertInstallationPackage">
         insert into installation_package(
-            installation_package, name, major_version_number, minor_version_number,revision_version_number,state,operating_state,page_tag_info,create_time,update_time)
+            installation_package, name, major_version_number, minor_version_number,revision_version_number,state,operating_state,page_tag_info_id,create_time,update_time)
         values (#{installationPackage},#{name},#{majorVersionNumber},#{minorVersionNumber},#{revisionVersionNumber},#{state},#{operatingState},#{pageTagInfoId},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
     </insert>
-    <delete id="deleteInstallationPackageById">
-        delete from installation_package
-        where id = #{id};
-    </delete>
+    <update id="deleteInstallationPackageById">
+        update installation_package
+            set installation_package = null ,update_time = UNIX_TIMESTAMP(now())
+        where id=#{id}
+    </update>
 </mapper>

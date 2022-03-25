@@ -1,8 +1,6 @@
 package com.graduation.management.mapper;
 
-import com.graduation.management.domain.PageTagInfo;
 import com.graduation.management.dto.PageTagInfoDTO;
-import com.graduation.management.dto.UserInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -32,10 +30,11 @@ public interface PageTagInfoMapper {
 
     /**
      * 插入页面标签
+     * 返回插入标签的主键id
      * @param pageTagInfoDTO
      * @return
      */
-    Integer insertPageTagInfo(PageTagInfoDTO pageTagInfoDTO);
+    Long insertPageTagInfo(PageTagInfoDTO pageTagInfoDTO);
 
     /**
      * 删除页面标签

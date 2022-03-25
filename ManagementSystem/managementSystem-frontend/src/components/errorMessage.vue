@@ -17,7 +17,7 @@ export default {
       this.errorMessage = errorMessage
       var el = document.getElementById('errorMessage')
       setTimeout(() => {
-        el.style.transform = 'translate(-50%,calc(10px + 100%))'
+        el.style.transform = 'translate(-50%,40px)'
         el.style.transition = 'all 1s ease'
       }, 0)
       setTimeout(() => {

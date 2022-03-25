@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         try {
             userInfoDTOList = userInfoMapper.selectUserInfo(userInfo);
         } catch(Exception e){
-            return BaseResult.FAIL((long) -1,e.getMessage(),null);
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
         /**
          * 4.验证用户是否存在

@@ -12,6 +12,7 @@
         <result column="description" property="description" />
         <result column="information" property="information" />
         <result column="sort" property="sort" />
+        <result column="is_show" property="isShow" />
     </resultMap>
     <select id="selectPageTagInfo" resultMap="BaseResultMap" parameterType="com.graduation.management.dto.PageTagInfoDTO">
         select * from page_tag_info
@@ -37,10 +38,13 @@
             <if test="sort != null and sort != ''">
                 and sort LIKE CONCAT(CONCAT('%',#{sort},'%')) ESCAPE '/'
             </if>
+            <if test="isShow != null isShow sort != '' ">
+                is_show = #{isShow}
+            </if>
         </where>
     </select>
     <select id="selectPageTagInfoBySort" resultType="com.graduation.management.dto.PageTagInfoDTO">
-        select * from page_tag_info where sort=#{sort}
+        select * from page_tag_info where sort=#{sort} and is_show = true
     </select>
     <update id="updatePageTagInfo" parameterType="com.graduation.management.dto.PageTagInfoDTO">
         update page_tag_info
@@ -52,11 +56,12 @@
             <if test="description != null and description != '' ">description=#{description},</if>
             <if test="information != null and information != '' ">information=#{information},</if>
             <if test="sort != null and sort != '' ">sort=#{sort},</if>
+            <if test="isShow != null isShow sort != '' ">is_show=#{isShow},</if>
             update_time = UNIX_TIMESTAMP(now())
         </set>
         where id=#{id}
     </update>
-    <insert id="insertPageTagInfo">
+    <insert id="insertPageTagInfo" useGeneratedKeys="true" keyProperty="id">
         insert into page_tag_info(
             img, code, title, url,description,information,sort,create_time,update_time)
         values (#{img},#{code},#{title},#{url},#{description},#{information},#{sort},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))

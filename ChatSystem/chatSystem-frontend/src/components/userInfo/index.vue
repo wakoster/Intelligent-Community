@@ -7,7 +7,7 @@
         <div class="updateImgBox" :class="{active: userInfo.userImg !== null}">
           <img class="preview" :src="userInfo.userImg" v-if="userInfo.userImg !== null">
           <label for="upload" v-if="userInfo.userImg === null">上传</label>
-          <input class="upload" id="upload" @change="userImgUpload($event)" ref="upload" type="file" multiple/>
+          <input class="upload" id="upload" @change="userImgUpload($event)" ref="upload" type="file"/>
           <div class="clearImg-box" v-if="userInfo.userImg !== null">
             <div class="clearImg" @click="userInfo.userImg = null
             $refs.upload.value = null">
