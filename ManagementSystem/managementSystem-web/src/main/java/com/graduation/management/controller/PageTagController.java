@@ -4,6 +4,7 @@ import com.graduation.management.dto.PageTagInfoDTO;
 import com.graduation.management.result.BaseResult;
 import com.graduation.management.service.InstallationPackageService;
 import com.graduation.management.service.PageTagService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +49,7 @@ public class PageTagController {
     @RequestMapping(value = "/getPageTagById",method = RequestMethod.POST)
     @ResponseBody
     public BaseResult getPageTagById(@RequestBody HashMap<String,Object> params){
-        return pageTagService.getPageTagInfoById(Long.valueOf((String) params.get("id")));
+        return pageTagService.getPageTagInfoById(Long.valueOf((Integer) params.get("id")));
     }
 
     /**
@@ -59,10 +60,13 @@ public class PageTagController {
     @ResponseBody
     public BaseResult setPageTagInfo(@RequestBody HashMap<String,Object> params){
         /**
-         * 先插入页面标签
+         * 入参判断
          */
         if(Objects.isNull(params.get("code"))){
             return BaseResult.FAIL((long) -1,"请填写标签标识码",null);
+        }
+        if(StringUtils.equals((String)params.get("code"),"0x0000")){
+            return BaseResult.FAIL((long) -1,"0x0000为特殊编码，禁止占用",null);
         }
         if(Objects.isNull(params.get("title"))){
             return BaseResult.FAIL((long) -1,"请填写标签标题",null);
@@ -71,6 +75,9 @@ public class PageTagController {
             return BaseResult.FAIL((long) -1,"请填写标签路径",null);
         }
         PageTagInfoDTO pageTagInfoDTO = new PageTagInfoDTO();
+        if(Objects.nonNull(params.get("id"))) {
+            pageTagInfoDTO.setId(Long.valueOf((Integer) params.get("id")));
+        }
         pageTagInfoDTO.setImg((String) params.get("img"));
         pageTagInfoDTO.setCode((String) params.get("code"));
         pageTagInfoDTO.setTitle((String) params.get("title"));
@@ -78,6 +85,9 @@ public class PageTagController {
         pageTagInfoDTO.setDescription((String) params.get("description"));
         pageTagInfoDTO.setInformation((String) params.get("information"));
         pageTagInfoDTO.setSort((String) params.get("sort"));
+        /**
+         * 先插入页面标签
+         */
         BaseResult baseResult = pageTagService.setPageTagInfo(pageTagInfoDTO);
         /**
          * 页面标签插入失败返回
@@ -88,6 +98,6 @@ public class PageTagController {
         /**
          * 再根据页面标签id关联安装包
          */
-        return installationPackageService.setPageTagInfoId((Long)baseResult.getData(),Long.valueOf((String) params.get("installationPackageId")));
+        return installationPackageService.setPageTagInfoId((Long)baseResult.getData(),Long.valueOf((Integer) params.get("installationPackageId")));
     }
 }

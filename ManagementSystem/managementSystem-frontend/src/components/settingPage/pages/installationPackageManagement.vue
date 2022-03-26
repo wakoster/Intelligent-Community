@@ -145,6 +145,7 @@ export default {
     return {
       uploadLoading: false,
       pageTagInfo: {
+        id: null,
         installationPackageId: null,
         img: null,
         code: null,
@@ -163,15 +164,7 @@ export default {
       },
       operatingRecord: {},
       operatingRecordRows: 10,
-      installationPackage: {
-        data: [
-          {
-            id: 17,
-            name: 'chart',
-            pageTagInfoId: null
-          }
-        ]
-      },
+      installationPackage: {},
       installationPackageScreeningCondition: {
         state: null,
         sign: null
@@ -179,14 +172,17 @@ export default {
     }
   },
   mounted: function () {
-    // 获取安装包信息
-    this.getInstallationPackage()
-    // 获取安装包操作记录
-    this.getOperatingRecord()
-    // 获取页面标签的分类信息
-    this.getPageTagSort()
+    this.initialize()
   },
   methods: {
+    initialize () { // 初始化
+      // 获取安装包信息
+      this.getInstallationPackage()
+      // 获取安装包操作记录
+      this.getOperatingRecord()
+      // 获取页面标签的分类信息
+      this.getPageTagSort()
+    },
     changeInstallationPackageScreeningCondition (state, sign) {
       this.installationPackageScreeningCondition.state = state
       this.installationPackageScreeningCondition.sign = sign
@@ -367,13 +363,15 @@ export default {
       this.on_off_configuration()
       if (item.pageTagInfoId !== null) {
         this.uploadLoading = true
-        console.log(item.pageTagInfoId)
+        this.pageTagInfo.id = item.pageTagInfoId
         this.$axios.post('/pageTag/getPageTagById', {id: item.pageTagInfoId})
           .then(resp => {
             let {
               data
             } = resp
             if (data.code === 0) {
+              console.log(data)
+              this.pageTagInfo.id = data.data.id
               this.pageTagInfo.img = data.data.img
               this.pageTagInfo.code = data.data.code
               this.pageTagInfo.title = data.data.title
@@ -405,6 +403,7 @@ export default {
           } = resp
           if (data.code === 0) {
             this.closePageTagInfo()
+            this.initialize()
           } else {
             this.showErrorMessage(data.msg)
           }
@@ -418,6 +417,7 @@ export default {
     },
     closePageTagInfo () {
       // 关闭页面标签设置界面
+      this.pageTagInfo.id = null
       this.pageTagInfo.installationPackageId = null
       this.pageTagInfo.img = null
       this.pageTagInfo.code = null

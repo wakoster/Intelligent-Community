@@ -72,8 +72,8 @@ public class PageTagServiceImpl implements PageTagService {
             if(Objects.nonNull(pageTagInfoDTOList) && !pageTagInfoDTOList.isEmpty()) {
                 map.put("sort", pageTagSortDTO.getSort());
                 map.put("list", pageTagInfoDTOList);
+                result.add(map);
             }
-            result.add(map);
         }
         return BaseResult.SUCCESS(result);
     }
@@ -83,7 +83,7 @@ public class PageTagServiceImpl implements PageTagService {
         PageTagInfoDTO pageTagInfoDTO = new PageTagInfoDTO();
         pageTagInfoDTO.setId(id);
         try {
-            return BaseResult.SUCCESS(pageTagInfoMapper.selectPageTagInfo(pageTagInfoDTO));
+            return BaseResult.SUCCESS(pageTagInfoMapper.selectPageTagInfo(pageTagInfoDTO).get(0));
         }catch (Exception e){
             return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
@@ -103,12 +103,65 @@ public class PageTagServiceImpl implements PageTagService {
 
     @Override
     public BaseResult setPageTagInfo(PageTagInfoDTO pageTagInfoDTO) {
-        Long pageTagInfoId;
+        /**
+         * 1.查询sort是否存在,不存在则插入
+         */
         try{
-            pageTagInfoId = pageTagInfoMapper.insertPageTagInfo(pageTagInfoDTO);
+            PageTagSortDTO pageTagSortDTO = new PageTagSortDTO();
+            pageTagSortDTO.setSort(pageTagInfoDTO.getSort());
+            List<PageTagSortDTO> pageTagSortDTOList = pageTagSortMapper.selectPageTagSort(pageTagSortDTO);
+            if(pageTagSortDTOList.isEmpty()){
+                pageTagSortMapper.insertPageTagSort(pageTagSortDTO);
+            }
         }catch (Exception e){
             return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
-        return BaseResult.SUCCESS(pageTagInfoId);
+        /**
+         * 2.如果id为空则插入（同时判断条件），不为空则更新
+         */
+        if(Objects.nonNull(pageTagInfoDTO.getId())) {
+            try {
+                pageTagInfoMapper.updatePageTagInfo(pageTagInfoDTO);
+                return BaseResult.SUCCESS(pageTagInfoDTO.getId());
+            } catch (Exception e) {
+                return BaseResult.ERROR((long) -1, e.getMessage(), null);
+            }
+        }else {
+            /**
+             * 2-1.判断code是否唯一
+             */
+            try {
+                PageTagInfoDTO pageTagInfo = new PageTagInfoDTO();
+                pageTagInfo.setCode(pageTagInfoDTO.getCode());
+                List<PageTagInfoDTO> pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfo(pageTagInfo);
+                if(!pageTagInfoDTOList.isEmpty()){
+                    return BaseResult.FAIL((long) -1, "标签标码重复", null);
+                }
+            } catch (Exception e) {
+                return BaseResult.ERROR((long) -1, e.getMessage(), null);
+            }
+            /**
+             * 2-2.判断url是否唯一
+             */
+            try {
+                PageTagInfoDTO pageTagInfo = new PageTagInfoDTO();
+                pageTagInfo.setUrl(pageTagInfoDTO.getUrl());
+                List<PageTagInfoDTO> pageTagInfoDTOList = pageTagInfoMapper.selectPageTagInfo(pageTagInfo);
+                if(!pageTagInfoDTOList.isEmpty()){
+                    return BaseResult.FAIL((long) -1, "标签路径重复", null);
+                }
+            } catch (Exception e) {
+                return BaseResult.ERROR((long) -1, e.getMessage(), null);
+            }
+            /**
+             * 2-3.插入
+             */
+            try {
+                pageTagInfoMapper.insertPageTagInfo(pageTagInfoDTO);
+                return BaseResult.SUCCESS(pageTagInfoDTO.getId());
+            } catch (Exception e) {
+                return BaseResult.ERROR((long) -1, e.getMessage(), null);
+            }
+        }
     }
 }
