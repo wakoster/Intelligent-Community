@@ -6,6 +6,7 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="installation_package" property="installationPackage" />
+        <result column="file_name" property="fileName" />
         <result column="name" property="name" />
         <result column="major_version_number" property="majorVersionNumber" />
         <result column="minor_version_number" property="minorVersionNumber" />
@@ -19,6 +20,9 @@
         <where>
             <if test="id != null">
                 and id = #{id}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                and file_name = #{fileName}
             </if>
             <if test="name != null and name != ''">
                 and name = #{name}
@@ -50,6 +54,7 @@
         update installation_package
         <set>
             <if test="installationPackage != null and installationPackage != '' ">installation_package=#{installationPackage},</if>
+            <if test="fileName != null and fileName != '' ">file_name=#{fileName},</if>
             <if test="name != null and name != '' ">name=#{name},</if>
             <if test="majorVersionNumber != null">major_version_number=#{majorVersionNumber},</if>
             <if test="minorVersionNumber != null">minor_version_number=#{minorVersionNumber},</if>
@@ -63,8 +68,8 @@
     </update>
     <insert id="insertInstallationPackage">
         insert into installation_package(
-            installation_package, name, major_version_number, minor_version_number,revision_version_number,state,operating_state,page_tag_info_id,create_time,update_time)
-        values (#{installationPackage},#{name},#{majorVersionNumber},#{minorVersionNumber},#{revisionVersionNumber},#{state},#{operatingState},#{pageTagInfoId},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
+            installation_package,file_name, name, major_version_number, minor_version_number,revision_version_number,state,operating_state,page_tag_info_id,create_time,update_time)
+        values (#{installationPackage},#{fileName},#{name},#{majorVersionNumber},#{minorVersionNumber},#{revisionVersionNumber},#{state},#{operatingState},#{pageTagInfoId},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()))
     </insert>
     <update id="deleteInstallationPackageById">
         update installation_package

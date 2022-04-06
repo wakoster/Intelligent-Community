@@ -34,6 +34,12 @@ public class InstallationPackage {
     private String installation_package;
 
     /**
+     * 文件名称
+     */
+    @Column(nullable = false)
+    private String file_name;
+
+    /**
      * 名称
      */
     @Column(nullable = false)

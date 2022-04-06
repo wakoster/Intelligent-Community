@@ -2,6 +2,8 @@ package com.graduation.management.dto;
 
 import lombok.Data;
 
+import javax.persistence.Column;
+
 /**
  * InstallationPackage表数据类
  */
@@ -26,6 +28,11 @@ public class InstallationPackageDTO {
      * 安装包文件
      */
     private String installationPackage;
+
+    /**
+     * 文件名称
+     */
+    private String fileName;
 
     /**
      * 名称

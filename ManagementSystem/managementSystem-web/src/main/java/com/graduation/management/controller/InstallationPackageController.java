@@ -81,4 +81,48 @@ public class InstallationPackageController {
     BaseResult deleteOperatingRecord(@RequestBody HashMap<String,Object> params){
         return installationPackageService.deleteOperatingRecord(Long.valueOf((Integer)params.get("id")));
     }
+
+    /**
+     * 安装
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/installInstallationPackage",method = RequestMethod.POST)
+    @ResponseBody
+    BaseResult installInstallationPackage(@RequestBody HashMap<String,Object> params,HttpSession session){
+        return installationPackageService.installInstallationPackage(Long.valueOf((Integer)params.get("installationPackageId")),session);
+    }
+
+    /**
+     * 启动
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/startInstallationPackage",method = RequestMethod.POST)
+    @ResponseBody
+    BaseResult startInstallationPackage(@RequestBody HashMap<String,Object> params,HttpSession session){
+        return installationPackageService.startInstallationPackage(Long.valueOf((Integer)params.get("installationPackageId")),session);
+    }
+
+    /**
+     * 停止
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/stopInstallationPackage",method = RequestMethod.POST)
+    @ResponseBody
+    BaseResult stopInstallationPackage(@RequestBody HashMap<String,Object> params,HttpSession session){
+        return installationPackageService.stopInstallationPackage(Long.valueOf((Integer)params.get("installationPackageId")),session);
+    }
+
+    /**
+     * 卸载
+     * @param params
+     * @return
+     */
+    @RequestMapping(value = "/removeInstallationPackage",method = RequestMethod.POST)
+    @ResponseBody
+    BaseResult removeInstallationPackage(@RequestBody HashMap<String,Object> params,HttpSession session){
+        return installationPackageService.removeInstallationPackage(Long.valueOf((Integer)params.get("installationPackageId")),session);
+    }
 }

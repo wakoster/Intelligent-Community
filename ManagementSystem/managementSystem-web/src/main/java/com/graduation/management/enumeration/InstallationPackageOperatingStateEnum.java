@@ -2,6 +2,7 @@ package com.graduation.management.enumeration;
 
 public enum InstallationPackageOperatingStateEnum {
     UNINSTALLED("未安装"),
+    INSTALLED("已安装"),
     NORMAL_OPERATION("正常运行"),
     STOPPED("已停止"),
     UN_START("未启动"),

@@ -56,7 +56,7 @@
             <if test="description != null and description != '' ">description=#{description},</if>
             <if test="information != null and information != '' ">information=#{information},</if>
             <if test="sort != null and sort != '' ">sort=#{sort},</if>
-            <if test="isShow != null and isShow != '' ">is_show=#{isShow},</if>
+            <if test="isShow != null">is_show=#{isShow},</if>
             update_time = UNIX_TIMESTAMP(now())
         </set>
         where id=#{id}

@@ -47,4 +47,36 @@ public interface InstallationPackageService {
      * @return
      */
     BaseResult setPageTagInfoId(Long pageTagInfoId,Long installationPackageId);
+
+    /**
+     * 安装安装包
+     * @param installationPackageId
+     * @param session
+     * @return
+     */
+    BaseResult installInstallationPackage(Long installationPackageId,HttpSession session);
+
+    /**
+     * 启动安装包
+     * @param installationPackageId
+     * @param session
+     * @return
+     */
+    BaseResult startInstallationPackage(Long installationPackageId,HttpSession session);
+
+    /**
+     * 停止安装包
+     * @param installationPackageId
+     * @param session
+     * @return
+     */
+    BaseResult stopInstallationPackage(Long installationPackageId,HttpSession session);
+
+    /**
+     * 删除安装包
+     * @param installationPackageId
+     * @param session
+     * @return
+     */
+    BaseResult removeInstallationPackage(Long installationPackageId,HttpSession session);
 }

@@ -61,5 +61,5 @@ public class PageTagInfoDTO {
     /**
      * 是否显示
      */
-    private String isShow;
+    private Boolean isShow;
 }

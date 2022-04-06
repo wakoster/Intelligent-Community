@@ -3,14 +3,17 @@ package com.graduation.management.service.impl;
 import com.graduation.management.dto.InstallationPackageDTO;
 import com.graduation.management.dto.InstallationSignInfoDTO;
 import com.graduation.management.dto.OperatingRecordDTO;
+import com.graduation.management.dto.PageTagInfoDTO;
 import com.graduation.management.enumeration.InstallationPackageOperatingStateEnum;
 import com.graduation.management.enumeration.InstallationPackageStateEnum;
 import com.graduation.management.mapper.InstallationPackageMapper;
 import com.graduation.management.mapper.InstallationSignInfoMapper;
 import com.graduation.management.mapper.OperatingRecordMapper;
+import com.graduation.management.mapper.PageTagInfoMapper;
 import com.graduation.management.result.BaseResult;
 import com.graduation.management.service.InstallationPackageService;
 import com.graduation.management.util.FileUtil;
+import com.graduation.management.util.NSSMUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +32,9 @@ public class InstallationPackageServiceImpl implements InstallationPackageServic
 
     @Resource
     OperatingRecordMapper operatingRecordMapper;
+
+    @Resource
+    PageTagInfoMapper pageTagInfoMapper;
 
     @Override
     public BaseResult selectAllInstallationPackage(HttpSession session) {
@@ -193,6 +199,7 @@ public class InstallationPackageServiceImpl implements InstallationPackageServic
     public BaseResult uploadInstallationPackage(MultipartFile installationPackage) {
         InstallationPackageDTO installationPackageDTO = new InstallationPackageDTO();
         String installationPackageName = installationPackage.getOriginalFilename();
+        installationPackageDTO.setFileName(installationPackageName);
         if(StringUtils.isEmpty(installationPackageName)){
             return BaseResult.FAIL((long) -1,"安装包名称获取失败",null);
         }
@@ -274,6 +281,165 @@ public class InstallationPackageServiceImpl implements InstallationPackageServic
             if(Objects.isNull(success) || success != 1){
                 return BaseResult.FAIL((long) -1,"安装包标签设置失败#setPageTagInfoId",null);
             }
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(null);
+    }
+
+    @Override
+    public BaseResult installInstallationPackage(Long installationPackageId, HttpSession session) {
+        /**
+         * 1.查询安装包
+         */
+        InstallationPackageDTO installationPackageDTO = new InstallationPackageDTO();
+        try {
+            installationPackageDTO = installationPackageMapper.selectInstallationPackageById(installationPackageId);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        /**
+         * 2.获取登录的用户信息
+         */
+        if(Objects.isNull(session.getAttribute("userSession"))){
+            return BaseResult.FAIL((long) -1,"失去登录信息",null);
+        }
+        Long userId = (Long)((Map)session.getAttribute("userSession")).get("userID");
+        /**
+         * 3.安装
+         */
+        try {
+            BaseResult result = NSSMUtil.install(installationPackageDTO.getName(),installationPackageDTO.getFileName());
+            if(result.getCode() == 0){
+                addOperatingRecord(installationPackageDTO.getId(),"安装成功",(String)result.getData(),userId);
+                installationPackageDTO.setState(InstallationPackageStateEnum.INSTALLED.getCode());
+                installationPackageDTO.setOperatingState(InstallationPackageOperatingStateEnum.INSTALLED.getCode());
+            }else {
+                addOperatingRecord(installationPackageDTO.getId(),"安装失败",(String)result.getData(),userId);
+            }
+            installationPackageMapper.updateInstallationPackage(installationPackageDTO);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(null);
+    }
+
+    @Override
+    public BaseResult startInstallationPackage(Long installationPackageId, HttpSession session) {
+        /**
+         * 1.查询安装包
+         */
+        InstallationPackageDTO installationPackageDTO = new InstallationPackageDTO();
+        try {
+            installationPackageDTO = installationPackageMapper.selectInstallationPackageById(installationPackageId);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        /**
+         * 2.获取登录的用户信息
+         */
+        if(Objects.isNull(session.getAttribute("userSession"))){
+            return BaseResult.FAIL((long) -1,"失去登录信息",null);
+        }
+        Long userId = (Long)((Map)session.getAttribute("userSession")).get("userID");
+        /**
+         * 3.启动
+         */
+        try {
+            BaseResult result = NSSMUtil.start(installationPackageDTO.getName());
+            if(result.getCode() == 0){
+                addOperatingRecord(installationPackageDTO.getId(),"启动成功",(String)result.getData(),userId);
+                installationPackageDTO.setOperatingState(InstallationPackageOperatingStateEnum.NORMAL_OPERATION.getCode());
+                if(Objects.nonNull(installationPackageDTO.getPageTagInfoId())){
+                    PageTagInfoDTO pageTagInfoDTO = new PageTagInfoDTO();
+                    pageTagInfoDTO.setId(installationPackageDTO.getPageTagInfoId());
+                    pageTagInfoDTO.setIsShow(true);
+                    pageTagInfoMapper.updatePageTagInfo(pageTagInfoDTO);
+                }
+            }else {
+                addOperatingRecord(installationPackageDTO.getId(),"启动失败",(String)result.getData(),userId);
+                installationPackageDTO.setOperatingState(InstallationPackageOperatingStateEnum.DEAD_STAR.getCode());
+            }
+            installationPackageMapper.updateInstallationPackage(installationPackageDTO);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(null);
+    }
+
+    @Override
+    public BaseResult stopInstallationPackage(Long installationPackageId, HttpSession session) {
+        /**
+         * 1.查询安装包
+         */
+        InstallationPackageDTO installationPackageDTO = new InstallationPackageDTO();
+        try {
+            installationPackageDTO = installationPackageMapper.selectInstallationPackageById(installationPackageId);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        /**
+         * 2.获取登录的用户信息
+         */
+        if(Objects.isNull(session.getAttribute("userSession"))){
+            return BaseResult.FAIL((long) -1,"失去登录信息",null);
+        }
+        Long userId = (Long)((Map)session.getAttribute("userSession")).get("userID");
+        /**
+         * 3.停止
+         */
+        try {
+            BaseResult result = NSSMUtil.stop(installationPackageDTO.getName());
+            if(result.getCode() == 0){
+                addOperatingRecord(installationPackageDTO.getId(),"停止成功",(String)result.getData(),userId);
+                installationPackageDTO.setOperatingState(InstallationPackageOperatingStateEnum.STOPPED.getCode());
+                if(Objects.nonNull(installationPackageDTO.getPageTagInfoId())){
+                    PageTagInfoDTO pageTagInfoDTO = new PageTagInfoDTO();
+                    pageTagInfoDTO.setId(installationPackageDTO.getPageTagInfoId());
+                    pageTagInfoDTO.setIsShow(false);
+                    pageTagInfoMapper.updatePageTagInfo(pageTagInfoDTO);
+                }
+            }else {
+                addOperatingRecord(installationPackageDTO.getId(),"停止失败",(String)result.getData(),userId);
+            }
+            installationPackageMapper.updateInstallationPackage(installationPackageDTO);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(null);
+    }
+
+    @Override
+    public BaseResult removeInstallationPackage(Long installationPackageId, HttpSession session) {
+        /**
+         * 1.查询安装包
+         */
+        InstallationPackageDTO installationPackageDTO = new InstallationPackageDTO();
+        try {
+            installationPackageDTO = installationPackageMapper.selectInstallationPackageById(installationPackageId);
+        }catch (Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        /**
+         * 2.获取登录的用户信息
+         */
+        if(Objects.isNull(session.getAttribute("userSession"))){
+            return BaseResult.FAIL((long) -1,"失去登录信息",null);
+        }
+        Long userId = (Long)((Map)session.getAttribute("userSession")).get("userID");
+        /**
+         * 3.卸载
+         */
+        try {
+            BaseResult result = NSSMUtil.remove(installationPackageDTO.getName());
+            if(result.getCode() == 0){
+                addOperatingRecord(installationPackageDTO.getId(),"卸载成功",(String)result.getData(),userId);
+                installationPackageDTO.setState(InstallationPackageStateEnum.UNINSTALLED.getCode());
+                installationPackageDTO.setOperatingState(InstallationPackageOperatingStateEnum.UNINSTALLED.getCode());
+            }else {
+                addOperatingRecord(installationPackageDTO.getId(),"卸载失败",(String)result.getData(),userId);
+            }
+            installationPackageMapper.updateInstallationPackage(installationPackageDTO);
         }catch (Exception e){
             return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }

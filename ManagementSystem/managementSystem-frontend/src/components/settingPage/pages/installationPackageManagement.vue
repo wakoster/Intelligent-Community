@@ -28,11 +28,11 @@
               <div class="versions">{{item.versions}}</div>
               <div class="operatingState">{{item.operatingState}}</div>
               <div class="operationBox">
-                <div class="operation" :class="{active: item.state == '未安装'}">安装</div>
-                <div class="operation" :class="{active: item.state == '已安装'}">卸载</div>
+                <div class="operation" :class="{active: item.state == '未安装'}" @click="installInstallationPackage(item.id)">安装</div>
+                <div class="operation" :class="{active: item.operatingState != '正常运行' && item.state == '已安装'}" @click="removeInstallationPackage(item.id)">卸载</div>
                 <div class="operation" :class="{active: item.state == '未安装'}" @click="deleteInstallationPackage(item,index)">删除</div>
-                <div class="operation" :class="{active: item.operatingState != '正常运行' && item.state != '未安装'}">启动</div>
-                <div class="operation" :class="{active: item.operatingState == '正常运行' && item.state != '未安装'}">停止</div>
+                <div class="operation" :class="{active: item.operatingState != '正常运行' && item.state != '未安装'}" @click="startInstallationPackage(item.id)">启动</div>
+                <div class="operation" :class="{active: item.operatingState == '正常运行' && item.state != '未安装'}" @click="stopInstallationPackage(item.id)">停止</div>
               </div>
               <div class="sign" v-if="item.sign" @click="sign(item,index)"><span class="iconfont">&#xe707;</span></div>
               <div class="sign" v-if="!item.sign" @click="sign(item,index)"><span class="iconfont">&#xe631;</span></div>
@@ -427,6 +427,39 @@ export default {
       this.pageTagInfo.information = null
       this.pageTagInfo.sort = null
       this.on_off_configuration()
+    },
+    installationPackageOperation (url, installationPackageId) {
+      // 安装包操作
+      this.uploadLoading = true
+      this.$axios.post(url, {installationPackageId: installationPackageId})
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.initialize()
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+        .finally(() => {
+          this.uploadLoading = false
+        })
+    },
+    installInstallationPackage (installationPackageId) {
+      this.installationPackageOperation('/installationPackage/installInstallationPackage', installationPackageId)
+    },
+    startInstallationPackage (installationPackageId) {
+      this.installationPackageOperation('/installationPackage/startInstallationPackage', installationPackageId)
+    },
+    stopInstallationPackage (installationPackageId) {
+      this.installationPackageOperation('/installationPackage/stopInstallationPackage', installationPackageId)
+    },
+    removeInstallationPackage (installationPackageId) {
+      this.installationPackageOperation('/installationPackage/removeInstallationPackage', installationPackageId)
     },
     on_off_configuration () {
       document.querySelector('.configuration .pop').classList.toggle('active')

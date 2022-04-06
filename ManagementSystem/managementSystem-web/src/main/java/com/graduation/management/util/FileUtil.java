@@ -13,7 +13,7 @@ import java.io.OutputStream;
 @Controller
 public class FileUtil {
 
-    static String installationPackagePath;
+    public static String installationPackagePath;
 
     @Value("${save.path.installationPackage}")
     public void setInstallationPackagePath(String installationPackagePath) {

@@ -1,6 +1,6 @@
-package com.graduation.management.config;
+package com.graduation.chat.config;
 
-import com.graduation.management.config.intercepors.LoginInterceptor;
+import com.graduation.chat.config.intercepors.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,10 +25,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
          */
         List<String> patterns = new ArrayList<>();
         patterns.add("/");
-        patterns.add("/login");
         patterns.add("/error");
-        patterns.add("/loginConsumer");
-        patterns.add("/loginManager");
         /**
          * 排除资源文件
          */
