@@ -69,7 +69,7 @@ export default {
   mounted: function () {
     // 获取页面标签
     this.getPageTag()
-    this.userName = this.$cookies.get('cookie_username')
+    this.getUserName()
   },
   methods: {
     closeTabBar (index) {
@@ -81,6 +81,24 @@ export default {
         this.tabBar.push(item)
       }
       this.code = item.code
+    },
+    getUserName () {
+      // 获取用户名
+      this.$axios
+        .get('/user/getUserName')
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.userName = data.data
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     getPageTag () {
       // 页面标签

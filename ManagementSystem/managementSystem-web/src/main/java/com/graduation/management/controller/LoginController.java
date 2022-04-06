@@ -61,7 +61,7 @@ public class LoginController {
         // 删除session里面的用户信息
         session.removeAttribute("userSession");
         // 清空cookie
-        Cookie cookie = new Cookie("cookie_username", null);
+        Cookie cookie = new Cookie("cookie_userPhoneNumber", null);
         cookie.setMaxAge(0);
         cookie.setPath(request.getContextPath());
         // 向客户端发送cookie

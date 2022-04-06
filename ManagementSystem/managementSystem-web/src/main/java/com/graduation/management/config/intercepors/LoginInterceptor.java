@@ -32,6 +32,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             put("/logout", AccessAuthorityEnum.DEFAULT_ACCESS);
             put("/pageTag", AccessAuthorityEnum.DEFAULT_ACCESS);
             put("/installationPackage", AccessAuthorityEnum.ONLY_MANAGER);
+            put("/user", AccessAuthorityEnum.DEFAULT_ACCESS);
         }
     };
 
@@ -63,10 +64,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         /**
          * 3.获取cookie里面的一些用户信息
          */
-        String cookie_username = null;
+        String cookie_userPhoneNumber = null;
         for (Cookie item : cookies) {
-            if ("cookie_username".equals(item.getName())) {
-                cookie_username = item.getValue();
+            if ("cookie_userPhoneNumber".equals(item.getName())) {
+                cookie_userPhoneNumber = item.getValue();
                 break;
             }
         }
@@ -77,7 +78,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         /**
          * 5.如果cookie或session为空或不相同，重定向到登录界面
          */
-        if (StringUtils.isEmpty(cookie_username) || Objects.isNull(session.getAttribute("userSession"))) {
+        if (StringUtils.isEmpty(cookie_userPhoneNumber) || Objects.isNull(session.getAttribute("userSession"))) {
             response.sendRedirect(redirect);
             return false;
         }
@@ -92,7 +93,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         /**
          * 7.更新cookie存活时间
          */
-        Cookie cookie = new Cookie("cookie_username", cookie_username);
+        Cookie cookie = new Cookie("cookie_userPhoneNumber", cookie_userPhoneNumber);
         // 设置cookie的持久化时间
         cookie.setMaxAge(2 * 60 * 60);
         // 设置为当前项目下都携带这个cookie

@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
         /**
          * 8.保存cookie
          */
-        Cookie cookie = new Cookie("cookie_username", userInfo.getName());
+        Cookie cookie = new Cookie("cookie_userPhoneNumber", userInfo.getPhoneNumber());
         // 设置cookie的持久化时间
         cookie.setMaxAge(2 * 60 * 60);
         // 设置为当前项目下都携带这个cookie

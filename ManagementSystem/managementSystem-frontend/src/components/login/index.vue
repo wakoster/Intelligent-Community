@@ -44,6 +44,10 @@ export default {
     }
   },
   mounted: function () {
+    // 判断当前页面是否是失去权限重定向于此,是的话就刷新页面
+    if (window.parent.location.href === 'http://localhost:3762/homepage') {
+      window.parent.location.reload()
+    }
     // 判断是否是要登录管理界面
     if (this.$route.query.active === 'settingPage') {
       this.homePageHiddenActive()

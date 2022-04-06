@@ -1,5 +1,8 @@
 package com.graduation.chat.enumeration;
 
+/**
+ * 用户权限控制枚举，请与management组件中的内容保持一致，切勿轻易修改
+ */
 public enum UserTypeEnum {
     /**
      * 二进制数，用于权限控制
