@@ -2,9 +2,6 @@ package com.graduation.management.dto;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.sql.Timestamp;
-
 /**
  * userInfo表数据类
  */

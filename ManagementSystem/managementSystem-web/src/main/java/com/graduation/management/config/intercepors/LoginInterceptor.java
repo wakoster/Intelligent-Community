@@ -1,13 +1,17 @@
 package com.graduation.management.config.intercepors;
 
 import com.graduation.management.enumeration.AccessAuthorityEnum;
+import com.graduation.management.result.BaseResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +26,10 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
+    @Resource
+    private RedisTemplate<String, HttpSession> redisTemplate;
+
     /**
      * 访问权限控制数据
      */
@@ -36,6 +44,10 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
     };
 
+
+    //todo:此项目采用cookie加session双重登录验证，单项目运行时可正常使用，但此项目通常需要与其他组件共享登录状态，因本人实力不足，暂未解决共享session的需要，所以其他组件仅能通过cookie来判断登录状态，这是极为不安全的
+    //todo:阅读建议https://www.cnblogs.com/andy-zhou/p/5360107.html，本文详解cookie和session
+    //todo:为实现不同组件间共享cookie，在访问session时必须采用request.getSession(false)方法而不能使用request.getSession()方法，避免造成session失效导致频繁登录问题
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         /**
@@ -74,11 +86,11 @@ public class LoginInterceptor implements HandlerInterceptor {
         /**
          * 4.获取HttpSession对象
          */
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         /**
          * 5.如果cookie或session为空或不相同，重定向到登录界面
          */
-        if (StringUtils.isEmpty(cookie_userPhoneNumber) || Objects.isNull(session.getAttribute("userSession"))) {
+        if (StringUtils.isEmpty(cookie_userPhoneNumber)|| Objects.isNull(session) || Objects.isNull(session.getAttribute("userSession"))) {
             response.sendRedirect(redirect);
             return false;
         }
@@ -95,9 +107,9 @@ public class LoginInterceptor implements HandlerInterceptor {
          */
         Cookie cookie = new Cookie("cookie_userPhoneNumber", cookie_userPhoneNumber);
         // 设置cookie的持久化时间
-        cookie.setMaxAge(2 * 60 * 60);
+        cookie.setMaxAge(12 * 60 * 60);
         // 设置为当前项目下都携带这个cookie
-        cookie.setPath(request.getContextPath());
+        cookie.setPath("/");
         response.addCookie(cookie);
         return true;
     }

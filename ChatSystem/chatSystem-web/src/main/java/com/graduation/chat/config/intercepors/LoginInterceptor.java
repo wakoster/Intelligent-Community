@@ -1,14 +1,21 @@
 package com.graduation.chat.config.intercepors;
 
+import com.google.gson.Gson;
 import com.graduation.chat.enumeration.AccessAuthorityEnum;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 访问权限控制逻辑
@@ -23,6 +31,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+
+    @Resource
+    private RedisTemplate<String, String> redisTemplate;
 
     public static String loginPath;
 
@@ -48,7 +59,12 @@ public class LoginInterceptor implements HandlerInterceptor {
          */
         String redirect;
         String fullPath = request.getServletPath();
-        String path = "/" + request.getServletPath().split("/")[1];
+        String path;
+        if(StringUtils.equals(fullPath,"/")){
+            path = "/";
+        }else{
+            path = "/" + request.getServletPath().split("/")[1];
+        }
         if((Objects.isNull(authority.get(fullPath)) ? authority.get(path) : authority.get(fullPath)) == AccessAuthorityEnum.ONLY_MANAGER){
             redirect = loginPath + "?active=settingPage";
         }else {
@@ -76,33 +92,44 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
         }
         /**
-         * 4.获取HttpSession对象
+         * 4.如果cookie为空，重定向到登录界面
          */
-        HttpSession session = request.getSession();
+        if (StringUtils.isEmpty(cookie_userPhoneNumber)) {
+            response.sendRedirect(redirect);
+            return false;
+        }
         /**
-         * 5.如果cookie或session为空或不相同，重定向到登录界面
+         * 5.获取redis中的HttpSession对象
+         * todo: 实力有限这里是map
          */
-        if (StringUtils.isEmpty(cookie_userPhoneNumber) || Objects.isNull(session.getAttribute("userSession")) || !StringUtils.equals(cookie_userPhoneNumber, String.valueOf(((Map)session.getAttribute("userSession")).get("userID")))) {
+        SessionDTO sessionDTO;
+        try {
+            Gson gson = new Gson();
+            sessionDTO = gson.fromJson(redisTemplate.opsForValue().get(cookie_userPhoneNumber),SessionDTO.class);
+        } catch(Exception e){
+            response.sendRedirect(redirect);
+            return false;
+        }
+        if (Objects.isNull(sessionDTO)) {
             response.sendRedirect(redirect);
             return false;
         }
         /**
          * 6.判断访问权限
          */
-        Map map = (Map) session.getAttribute("userSession");
-        if((Long)map.get("type") != 0 && (Objects.isNull(authority.get(fullPath)) ? authority.get(path).getCode() & (Long)map.get("type") : authority.get(fullPath).getCode() & (Long)map.get("type")) == 0){
+        if(sessionDTO.getType() != 0 && (Objects.isNull(authority.get(fullPath)) ? authority.get(path).getCode() & sessionDTO.getType() : authority.get(fullPath).getCode() & sessionDTO.getType()) == 0){
             response.sendRedirect(redirect);
             return false;
         }
         /**
          * 7.更新cookie存活时间
          */
-//        Cookie cookie = new Cookie("cookie_userPhoneNumber", cookie_userPhoneNumber);
-//        // 设置cookie的持久化时间
-//        cookie.setMaxAge(2 * 60 * 60);
-//        // 设置为当前项目下都携带这个cookie
-//        cookie.setPath(request.getContextPath());
-//        response.addCookie(cookie);
+        Cookie cookie = new Cookie("cookie_userPhoneNumber", cookie_userPhoneNumber);
+        // 设置cookie的持久化时间
+        cookie.setMaxAge(12 * 60 * 60);
+        // 设置为当前项目下都携带这个cookie
+        cookie.setPath("/");
+        response.addCookie(cookie);
         return true;
     }
 
@@ -112,5 +139,17 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+    }
+
+    /**
+     * 用于接受来自redis反序列化出的数据
+     */
+    @Data
+    public static class SessionDTO {
+        private Long userID;
+        private String phoneNumber;
+        private String name;
+        private Long type;
+        private String userImg;
     }
 }

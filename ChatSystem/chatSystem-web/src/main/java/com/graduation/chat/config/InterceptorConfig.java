@@ -24,7 +24,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
          * 允许匿名登录的地址
          */
         List<String> patterns = new ArrayList<>();
-        patterns.add("/chatSystem");
         patterns.add("/error");
         /**
          * 排除资源文件
