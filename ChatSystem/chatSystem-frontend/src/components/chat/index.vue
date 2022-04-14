@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import errorMessage from '../errorMessage.vue'
+import errorMessage from '../message.vue'
 export default {
   components: { errorMessage },
   name: 'Chat',

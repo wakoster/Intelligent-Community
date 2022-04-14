@@ -48,6 +48,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public static HashMap<String, AccessAuthorityEnum> authority = new HashMap<String, AccessAuthorityEnum>(){
         {
             put("/chatSystem", AccessAuthorityEnum.DEFAULT_ACCESS);
+            put("/user", AccessAuthorityEnum.DEFAULT_ACCESS);
         }
     };
 

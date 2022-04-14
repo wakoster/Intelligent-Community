@@ -24,12 +24,6 @@
         </div>
       </div>
       <div class="informationBox">
-        <div>电话号码:</div>
-        <div class="inputBox">
-          <input type="tel" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写电话号码" v-model="userInfo.phoneNumber">
-        </div>
-      </div>
-      <div class="informationBox">
         <div>所在地区:</div>
         <div class="inputBox">
           <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写所在地区" v-model="userInfo.address">
@@ -41,7 +35,7 @@
           <input type="text" @focus="activeLink($event)" @blur="clearActive()" placeholder="请填写个人签名" v-model="userInfo.sign">
         </div>
       </div>
-      <button class="button" type="submit" @click="clearBaseInformation">提交修改</button>
+      <button class="button" type="submit" @click="changeInformation">提交修改</button>
       <div class="line"></div>
       <label>密码设置</label>
       <div class="informationBox">
@@ -63,23 +57,22 @@
         </div>
         <div class="errorMessage" :class="{active: password.newPassword === password.newPasswordAgain}">两次输入不一致</div>
       </div>
-      <button class="button" type="submit" @click="clearPassword">修改密码</button>
+      <button class="button" type="submit" @click="changePassword">修改密码</button>
     </div>
-    <error-message ref="errorMessage"></error-message>
+    <message ref="message"></message>
   </div>
 </template>
 
 <script>
-import errorMessage from '../errorMessage.vue'
+import message from '../message.vue'
 export default {
-  components: { errorMessage },
+  components: { message },
   name: 'UserInfo',
   data: function () {
     return {
       userInfo: {
         userImg: null,
         mailbox: null,
-        phoneNumber: null,
         address: null,
         sign: null
       },
@@ -89,6 +82,9 @@ export default {
         newPasswordAgain: null
       }
     }
+  },
+  mounted: function () {
+    this.selectInformation()
   },
   methods: {
     activeLink (event) {
@@ -104,7 +100,6 @@ export default {
     },
     clearBaseInformation () {
       this.userInfo.userImg = null
-      this.$refs.upload.value = null
       this.userInfo.mailbox = null
       this.userInfo.phoneNumber = null
       this.userInfo.address = null
@@ -136,8 +131,79 @@ export default {
         This.userInfo.userImg = this.result
       }
     },
+    changeInformation () {
+      // 更改信息
+      this.$axios
+        .post('/user/changeInformation', {
+          phoneNumber: this.$cookies.get('cookie_userPhoneNumber'),
+          userImg: this.userInfo.userImg,
+          mailbox: this.userInfo.mailbox,
+          address: this.userInfo.address,
+          sign: this.userInfo.sign
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.showInfoMessage('修改成功')
+            this.selectInformation()
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    changePassword () {
+      // 更改密码
+      this.$axios
+        .post('/user/changePassword', {
+          phoneNumber: this.$cookies.get('cookie_userPhoneNumber'),
+          oldPassword: this.$md5(this.password.oldPassword + 'KEY'),
+          newPassword: this.password.newPassword
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.showInfoMessage('修改成功')
+            this.clearPassword()
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    selectInformation () {
+      // 查询信息
+      this.$axios
+        .post('/user/selectInformation', {
+          phoneNumber: this.$cookies.get('cookie_userPhoneNumber')
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.userInfo = data.data
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
     showErrorMessage (errorMessage) {
-      this.$refs.errorMessage.setErrorMessage(errorMessage)
+      this.$refs.message.setErrorMessage(errorMessage)
+    },
+    showInfoMessage (infoMessage) {
+      this.$refs.message.setInfoMessage(infoMessage)
     }
   }
 }

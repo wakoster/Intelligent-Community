@@ -1,4 +1,4 @@
-package com.graduation.management.domain;
+package com.graduation.chat.domain;
 
 import lombok.Data;
 

@@ -1,12 +1,12 @@
-package com.graduation.management.dto;
+package com.graduation.chat.result;
 
 import lombok.Data;
 
 /**
- * userInfo表数据类
+ * 用户信息返回DTO
  */
 @Data
-public class UserInfoDTO {
+public class ContactResult {
     /**
      * 编号
      */
@@ -18,11 +18,6 @@ public class UserInfoDTO {
     private String phoneNumber;
 
     /**
-     * 密码
-     */
-    private String password;
-
-    /**
      * 名字
      */
     private String name;
@@ -31,16 +26,6 @@ public class UserInfoDTO {
      * 头像图片
      */
     private String userImg;
-
-    /**
-     * 创建时间
-     */
-    private Long createTime;
-
-    /**
-     * 修改时间
-     */
-    private Long updateTime;
 
     /**
      * 邮箱地址
@@ -56,11 +41,6 @@ public class UserInfoDTO {
      * 个人签名
      */
     private String sign;
-
-    /**
-     * 账号类型
-     */
-    private Long type;
 
     /**
      * 所属部门

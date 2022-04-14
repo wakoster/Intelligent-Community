@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.graduation.management.mapper.UserInfoMapper">
-    <resultMap id="BaseResultMap" type="com.graduation.management.dto.UserInfoDTO">
+<mapper namespace="com.graduation.chat.mapper.UserInfoMapper">
+    <resultMap id="BaseResultMap" type="com.graduation.chat.dto.UserInfoDTO">
         <id column="id" jdbcType="INTEGER" property="id" />
         <result column="phone_number" property="phoneNumber" />
         <result column="password" property="password" />
@@ -15,7 +15,17 @@
         <result column="type" property="type"/>
         <result column="department" property="department"/>
     </resultMap>
-    <select id="selectUserInfo" resultMap="BaseResultMap" parameterType="com.graduation.management.dto.UserInfoDTO">
+    <resultMap id="ContactResultMap" type="com.graduation.chat.result.ContactResult">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="name" property="name" />
+        <result column="user_img" property="userImg" />
+        <result column="mailbox" property="mailbox" />
+        <result column="address" property="address" />
+        <result column="sign" property="sign" />
+        <result column="department" property="department"/>
+    </resultMap>
+    <select id="selectUserInfo" resultMap="BaseResultMap" parameterType="com.graduation.chat.dto.UserInfoDTO">
         select * from user_info
         <where>
             <if test="id != null">
@@ -47,23 +57,31 @@
             </if>
         </where>
     </select>
-    <update id="updateUserInfo" parameterType="com.graduation.management.dto.UserInfoDTO">
+    <select id="selectUserListByNameWithoutPhoneNumber" resultMap="ContactResultMap">
+        select * from user_info
+        <where>
+            <if test="name != null and name != ''">
+                and name LIKE CONCAT(CONCAT('%',#{name},'%')) ESCAPE '/'
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                and phone_number != #{phoneNumber}
+            </if>
+        </where>
+    </select>
+    <select id="selectUserInfoByPhoneNumber" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select * from user_info where phone_number = #{phoneNumber}
+    </select>
+    <select id="selectUserInfoById" resultMap="BaseResultMap">
+        select * from user_info where id = #{id}
+    </select>
+    <update id="updateUserInfo" parameterType="com.graduation.chat.dto.UserInfoDTO">
         update user_info
-        <set>
-            <if test="name != null and name != '' ">name=#{name},</if>
-            <if test="userImg != null and userImg != '' ">user_img=#{userImg},</if>
-            <if test="mailbox != null and mailbox != '' ">mailbox=#{mailbox},</if>
-            <if test="address != null and address != '' ">address=#{address},</if>
-            <if test="sign != null and sign != '' ">sign=#{sign},</if>
-            <if test="type != null and type != '' ">type=#{type},</if>
-            <if test="department != null and department != '' ">department=#{department},</if>
-            update_time = UNIX_TIMESTAMP(now())
-        </set>
+        set user_img=#{userImg},mailbox=#{mailbox},address=#{address},sign=#{sign},update_time = UNIX_TIMESTAMP(now())
         where id=#{id}
     </update>
-    <insert id="insertUserInfo">
-        insert into user_info(
-            phone_number, password, name, user_img,create_time,update_time,mailbox,address,sign,type,department)
-        values (#{phoneNumber},#{password},#{name},#{userImg},UNIX_TIMESTAMP(now()),UNIX_TIMESTAMP(now()),#{mailbox},#{address},#{sign},#{type},#{department})
-    </insert>
+    <update id="updatePassword">
+        update user_info
+        set password=#{password},update_time = UNIX_TIMESTAMP(now())
+        where id=#{id}
+    </update>
 </mapper>

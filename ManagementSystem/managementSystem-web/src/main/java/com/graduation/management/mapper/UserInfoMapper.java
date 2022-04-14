@@ -22,14 +22,6 @@ public interface UserInfoMapper {
     Integer updateUserInfo(UserInfoDTO userInfoDTO);
 
     /**
-     * 修改密码
-     * @param phoneNumber
-     * @param password
-     * @return
-     */
-    Integer updatePassword(String phoneNumber,String password);
-
-    /**
      * 插入用户信息
      * @param userInfoDTO
      * @return

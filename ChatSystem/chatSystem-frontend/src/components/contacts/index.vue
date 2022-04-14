@@ -4,19 +4,19 @@
       <div class="search"><!-- 联系人搜索栏 -->
         <div class="search-iconfont"><span class="iconfont" onclick="document.querySelector('.search').classList.toggle('active')">&#xe604;</span></div>
         <div class="search-input">
-          <input type="text" placeholder="Search" id="search-input">
+          <input type="text" placeholder="Search" id="search-input" @input="selectUserList($event.currentTarget.value)">
         </div>
         <div class="clear-iconfont"><span class="iconfont" onclick="document.getElementById('search-input').value = ''">&#xe617;</span></div>
       </div>
       <div class="contactTag"><!-- 联系人tag -->
-        <div v-for="contact in contactTag.list" :key="contact.groupName">
+        <div v-for="contact in contactTag.data" :key="contact.groupName">
           <div class="groupName">{{contact.groupName}}</div>
           <div v-for="item in contact.list" :key="item.userId">
-            <div class="contactBox" @click="activeLink($event)">
+            <div class="contactBox" @click="activeLink($event,item)">
               <div class="contactCircle">
                 <img class="img" :src='item.userImg'>
               </div>
-              <label class="userName">{{item.userName}}</label>
+              <label class="userName">{{item.name}}</label>
             </div>
           </div>
         </div>
@@ -27,18 +27,18 @@
         <div class="user-information">
           <div class="nameAndImg-box">
             <div>
-              <div class="userName">{{userInfo.userName}}</div>
-              <div class="userSign">{{userInfo.userSign}}</div>
+              <div class="userName">{{userInfo.name}}</div>
+              <div class="userSign">{{userInfo.sign}}</div>
             </div>
             <img class="userImg" :src='userInfo.userImg'>
           </div>
           <div class="line"></div>
           <div class="otherInfo-box">
-            <div class="userPhone"><label>电话号码:</label>{{userInfo.userPhone}}</div>
-            <div class="userAddres"><label>地&emsp;&emsp;区:</label>{{userInfo.userAddress}}</div>
-            <div class="userAddres"><label>部&emsp;&emsp;门:</label>{{userInfo.userDepartment}}</div>
+            <div class="userPhone"><label>电话号码:</label>{{userInfo.phoneNumber}}</div>
+            <div class="userAddres"><label>地&emsp;&emsp;区:</label>{{userInfo.address}}</div>
+            <div class="userAddres"><label>部&emsp;&emsp;门:</label>{{userInfo.department}}</div>
           </div>
-          <button class="button" type="submit" @click="sendMessage(userInfo.userId)">发消息</button>
+          <button class="button" type="submit" @click="sendMessage(userInfo.id)">发消息</button>
         </div>
       </div>
     </div>
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import errorMessage from '../errorMessage.vue'
+import errorMessage from '../message.vue'
 export default {
   components: { errorMessage },
   name: 'Contacts',
@@ -57,18 +57,18 @@ export default {
         code: 0,
         msg: '成功!',
         total: 3,
-        list: [
+        data: [
           {
             groupName: '默认分组',
             list: [
               {
-                userId: '1',
-                userName: '北京客户您好，我想咨询一下资费问题',
+                id: '1',
+                name: '北京客户您好，我想咨询一下资费问题',
                 userImg: ''
               },
               {
-                userId: '2',
-                userName: '上海客户',
+                id: '2',
+                name: '上海客户',
                 userImg: ''
               }
             ]
@@ -77,34 +77,52 @@ export default {
             groupName: '朋友',
             list: [
               {
-                userId: '1',
-                userName: 'xxx',
+                id: '1',
+                name: 'xxx',
                 userImg: ''
               }
             ]
           }
         ]
       },
-      userInfo: {
-        userId: '16455',
-        userImg: '',
-        userName: '北京客户',
-        userSign: '北京客户户北京客户北京客户北京客户',
-        userPhone: '19855143351',
-        userAddress: '山西 太原',
-        userDepartment: '小区管控'
-      }
+      userInfo: {}
     }
   },
+  mounted: function () {
+    this.selectUserList()
+  },
   methods: {
-    activeLink (event) {
+    activeLink (event, item) {
       // 给联系人tag挂载active
       document.querySelectorAll('.contactBox.active').forEach((item) =>
         item.classList.remove('active'))
       event.currentTarget.className += ' active'
+      this.userInfo = item
     },
     sendMessage (userId) {
       // 在后端解决跳转和带参问题
+    },
+    selectUserList (name) {
+      // 查询联系人列表
+      this.$axios
+        .post('/user/selectUserList', {
+          phoneNumber: this.$cookies.get('cookie_userPhoneNumber'),
+          name: name
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.contactTag = data
+            this.userInfo = {}
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)

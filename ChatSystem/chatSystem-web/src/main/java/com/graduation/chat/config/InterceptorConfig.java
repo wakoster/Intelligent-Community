@@ -25,6 +25,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
          */
         List<String> patterns = new ArrayList<>();
         patterns.add("/error");
+
+        patterns.add("/user/**");
         /**
          * 排除资源文件
          */

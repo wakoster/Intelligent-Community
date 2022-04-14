@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTO Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduation.chat.mapper.ChatMapper">
+    <resultMap id="ChatListResultMap" type="com.graduation.chat.result.ChatListResult">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="receiver_user_info_id" property="userInfoId" />
+        <result column="name" property="name" />
+        <result column="user_img" property="userImg" />
+        <result column="unread_message" property="unreadMessage" />
+        <result column="talk_info" property="talkInfo" />
+        <result column="talk_time" property="talkTime" />
+    </resultMap>
+    <select id="selectChatListToGetChatUserId" resultType="java.lang.Long">
+        select user_id from
+			(select receiver_user_info_id as user_id,create_time from chatting_record where sender_user_info_id = #{userId}
+			UNION
+		    select sender_user_info_id as user_id,create_time from chatting_record where receiver_user_info_id = #{userId}) chat_user
+		group by user_id
+		ORDER BY max(create_time) desc
+    </select>
+    <select id="selectChatList" resultMap="ChatListResultMap">
+        select chat_record.id as id,receiver_user_info_id,name,user_img,unread_message,chatting_record as talk_info,chat_record.create_time as talk_time FROM
+            (select id,chatting_record,create_time,unread_message,record_info.receiver_user_info_id from
+                (select id,chatting_record,create_time,IF(sender_user_info_id = #{userId},receiver_user_info_id,sender_user_info_id) as receiver_user_info_id from chatting_record
+                    where (sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}) or (sender_user_info_id = #{chatUserId} and receiver_user_info_id = #{userId}) ORDER BY create_time DESC LIMIT 1) record_info
+                LEFT JOIN
+                (select COUNT(unread_message) as unread_message,receiver_user_info_id from chatting_record where unread_message = FALSE and sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}) unread_message
+                on record_info.receiver_user_info_id = unread_message.receiver_user_info_id) chat_record
+            LEFT JOIN
+            user_info
+            on chat_record.receiver_user_info_id = user_info.id
+    </select>
+    <insert id="insertChatList">
+    </insert>
+
+</mapper>

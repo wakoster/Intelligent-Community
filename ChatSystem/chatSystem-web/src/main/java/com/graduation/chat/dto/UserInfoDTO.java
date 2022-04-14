@@ -1,55 +1,46 @@
-package com.graduation.management.domain;
+package com.graduation.chat.dto;
 
 import lombok.Data;
 
-import javax.persistence.*;
-
 /**
- * userInfo表实体类
- * 保存用户信息
+ * userInfo表数据类，与数据库保持一致
  */
 @Data
-@Entity
-public class UserInfo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserInfoDTO {
+    /**
+     * 编号
+     */
     private Long id;
 
     /**
      * 电话号码(账号)
      */
-    @Column(nullable = false,unique = true, updatable = false)
-    private String phone_number;
+    private String phoneNumber;
 
     /**
      * 密码
      */
-    @Column(nullable = false)
     private String password;
 
     /**
      * 名字
      */
-    @Column(nullable = false)
     private String name;
 
     /**
      * 头像图片
      */
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String user_img;
+    private String userImg;
 
     /**
      * 创建时间
      */
-    @Column(updatable = false, nullable = false)
-    private Long create_time;
+    private Long createTime;
 
     /**
      * 修改时间
      */
-    @Column(nullable = false)
-    private Long update_time;
+    private Long updateTime;
 
     /**
      * 邮箱地址
@@ -69,7 +60,6 @@ public class UserInfo {
     /**
      * 账号类型
      */
-    @Column(nullable = false)
     private Long type;
 
     /**
