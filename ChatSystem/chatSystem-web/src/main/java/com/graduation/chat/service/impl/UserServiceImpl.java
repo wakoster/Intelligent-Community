@@ -1,5 +1,6 @@
 package com.graduation.chat.service.impl;
 
+import com.graduation.chat.config.intercepors.LoginInterceptor;
 import com.graduation.chat.result.ContactResult;
 import com.graduation.chat.dto.UserInfoDTO;
 import com.graduation.chat.mapper.UserInfoMapper;
@@ -10,10 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -158,5 +159,66 @@ public class UserServiceImpl implements UserService {
             result.add(map);
         }
         return BaseResult.SUCCESS(result);
+    }
+
+    @Override
+    public BaseResult selectUserInfoById(Long id) {
+        /**
+         * 1.查询信息
+         */
+        ContactResult contactResult = new ContactResult();
+        try {
+            contactResult = userInfoMapper.selectUserInfoById(id);
+        } catch(Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(contactResult);
+    }
+
+    @Override
+    public BaseResult selectSelfUserInfo(HttpServletRequest request, HttpServletResponse response){
+        /**
+         * 1.获得cookie
+         */
+//        Cookie[] cookies = request.getCookies();
+//        /**
+//         * 2.获取cookie里面的电话号码
+//         */
+//        String cookie_userPhoneNumber = null;
+//        for (Cookie item : cookies) {
+//            if ("cookie_userPhoneNumber".equals(item.getName())) {
+//                cookie_userPhoneNumber = item.getValue();
+//                break;
+//            }
+//        }
+        String cookie_userPhoneNumber = "19855143351";
+        /**
+         * 3.查询用户
+         */
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        try {
+            userInfoDTO = userInfoMapper.selectUserInfoByPhoneNumber(cookie_userPhoneNumber);
+            /**
+             * 4.验证用户是否存在
+             */
+            if(Objects.isNull(userInfoDTO)){
+                return BaseResult.FAIL((long) -1,"请重新登录",null);
+            }
+        } catch(Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        Map<String,Object> map = new HashMap<>();
+        /**
+         * 5.组装
+         */
+        map.put("id",userInfoDTO.getId());
+        map.put("phoneNumber",userInfoDTO.getPhoneNumber());
+        map.put("name",userInfoDTO.getName());
+        map.put("userImg",userInfoDTO.getUserImg());
+        map.put("mailbox",userInfoDTO.getMailbox());
+        map.put("address",userInfoDTO.getAddress());
+        map.put("sign",userInfoDTO.getSign());
+        map.put("department",userInfoDTO.getDepartment());
+        return BaseResult.SUCCESS(map);
     }
 }

@@ -9,11 +9,4 @@ import javax.annotation.Resource;
 
 @SpringBootTest
 class ChatApplicationTests {
-    @Resource
-    ChatService chatService;
-    @Test
-    public void test(){
-        BaseResult baseResult = chatService.selectChatList("15110322010");
-        int i = 1;
-    }
 }

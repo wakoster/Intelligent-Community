@@ -8,5 +8,14 @@ public interface ChatService {
      * @param phoneNumber
      * @return
      */
-    BaseResult selectChatList(String phoneNumber);
+    BaseResult selectChatList(String phoneNumber,String userId);
+
+    /**
+     * 查询聊天列表
+     * @param userId
+     * @param chatUserId
+     * @param page
+     * @return
+     */
+    BaseResult selectChattingRecord(Long userId, Long chatUserId,Integer page);
 }

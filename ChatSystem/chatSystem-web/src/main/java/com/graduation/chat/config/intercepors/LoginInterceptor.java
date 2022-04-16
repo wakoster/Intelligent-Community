@@ -49,6 +49,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         {
             put("/chatSystem", AccessAuthorityEnum.DEFAULT_ACCESS);
             put("/user", AccessAuthorityEnum.DEFAULT_ACCESS);
+            put("/chat", AccessAuthorityEnum.DEFAULT_ACCESS);
         }
     };
 

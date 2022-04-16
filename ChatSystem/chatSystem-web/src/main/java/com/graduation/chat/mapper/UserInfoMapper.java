@@ -35,7 +35,7 @@ public interface UserInfoMapper {
      * @param id
      * @return
      */
-    UserInfoDTO selectUserInfoById(Long id);
+    ContactResult selectUserInfoById(Long id);
 
     /**
      * 更新用户信息

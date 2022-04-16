@@ -1,10 +1,12 @@
 package com.graduation.chat.service.impl;
 
+import com.graduation.chat.dto.ChattingRecordDTO;
 import com.graduation.chat.dto.UserInfoDTO;
 import com.graduation.chat.mapper.ChatMapper;
 import com.graduation.chat.mapper.UserInfoMapper;
 import com.graduation.chat.result.BaseResult;
 import com.graduation.chat.result.ChatListResult;
+import com.graduation.chat.result.ContactResult;
 import com.graduation.chat.service.ChatService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class ChatServiceImpl implements ChatService {
     ChatMapper chatMapper;
 
     @Override
-    public BaseResult selectChatList(String phoneNumber) {
+    public BaseResult selectChatList(String phoneNumber, String userId) {
         /**
          * 1.判断输入是否为空
          */
@@ -54,10 +56,23 @@ public class ChatServiceImpl implements ChatService {
         } catch(Exception e){
             return BaseResult.ERROR((long) -1,e.getMessage(),null);
         }
-        /**
-         * 获取聊天列表
-         */
         List<ChatListResult> chatListResultList = new ArrayList<>();
+        /**
+         * 4.如果userId不为空，说明是从联系人界面发起的聊天
+         * 则判断是否以前进行过聊天，没有则创建
+         */
+        if(!StringUtils.isEmpty(userId) && !chatUserIdList.contains(Long.valueOf(userId))){
+            ContactResult contactResult = userInfoMapper.selectUserInfoById(Long.valueOf(userId));
+            ChatListResult chatListResult = new ChatListResult();
+            chatListResult.setId((long) 0);
+            chatListResult.setUserId(contactResult.getId());
+            chatListResult.setUserName(contactResult.getName());
+            chatListResult.setUserImg(contactResult.getUserImg());
+            chatListResultList.add(chatListResult);
+        }
+        /**
+         * 5.获取聊天列表
+         */
         for(Long chatUserId:chatUserIdList){
             try {
                 chatListResultList.add(chatMapper.selectChatList(userInfoDTO.getId(),chatUserId));
@@ -66,5 +81,27 @@ public class ChatServiceImpl implements ChatService {
             }
         }
         return BaseResult.SUCCESS(chatListResultList);
+    }
+
+    @Override
+    public BaseResult selectChattingRecord(Long userId, Long chatUserId, Integer page) {
+        List<ChattingRecordDTO> chattingRecordDTOList = new ArrayList<>();
+        /**
+         * 1.查询消息
+         */
+        try {
+            chattingRecordDTOList = chatMapper.selectChattingRecord(userId,chatUserId,20*page);
+        } catch(Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        /**
+         * 2.设置已读
+         */
+        try {
+            chatMapper.updateUnreadMessage(userId,chatUserId);
+        } catch(Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(chattingRecordDTOList);
     }
 }

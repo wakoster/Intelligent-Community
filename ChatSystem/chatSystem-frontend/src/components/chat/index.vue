@@ -9,8 +9,8 @@
         <div class="clear-iconfont"><span class="iconfont" onclick="document.getElementById('search-input').value = ''">&#xe617;</span></div>
       </div>
       <div class="talkTag"><!-- 聊天简略信息 -->
-        <div v-for="item in talkTag.list" :key="item.userId">
-          <div class="talkbox" :class="{active: item.userId == info.userId}" @click="activeLink($event)">
+        <div v-for="item in talkTag.data" :key="item.id">
+          <div class="talkbox" :class="{active: item.userId == info.userId}" @click="item.unreadMessage = 0;clickTalkBox($event,item)">
             <div class="talkcircle">
               <img class="img" :src='item.userImg'>
               <!-- <img class="img" src='../../assets/logo.png'> -->
@@ -18,44 +18,48 @@
             <div class="unreadNumber" v-if="item.unreadMessage > 0">{{item.unreadMessage > 99 ? '···' : item.unreadMessage}}</div>
             <label class="userName">{{item.userName}}</label>
             <label class="talkInfo">{{item.talkInfo}}</label>
-            <label class="talkTime">{{item.talkTime}}</label>
+            <label class="talkTime">{{formatDate(item.talkTime)}}</label>
           </div>
         </div>
       </div>
     </div>
     <div class="session">
-      <div class="session-box" v-if="JSON.stringify(sessionMsg) !=='{}'">
-        <label class="userName">北京客户</label>
+      <div class="session-box" v-if="info.userId !== undefined">
+        <label class="userName">{{info.userName}}</label>
         <div class="session-window">
-          <div class="more">查看更多消息</div>
-          <div v-for="item in sessionMsg.list" :key="item.time">
-            <div class="session-msg"  :class="{receiver: item.name === '我'}">
-              <img class="userImg" :src='item.image'>
+          <div class="more hidden" @click="moreChattingRecord(true)">查看更多消息</div>
+          <div v-for="item in sessionMsg.data" :key="item.userId">
+            <div class="session-msg"  :class="{receiver: item.senderUserInfo === info.userId}">
+              <img class="userImg" :src='info.userImg' v-if="item.senderUserInfo !== info.userId">
+              <img class="userImg" :src='selfUserInfo.userImg' v-if="item.senderUserInfo === info.userId">
               <div class="msg-detail">
                 <div class="msg-title">
-                  <label class="user-name">{{item.name}}</label>
-                  <label class="msg-time">{{item.time}}</label>
+                  <label class="user-name" v-if="item.senderUserInfo !== info.userId">{{info.userName}}</label>
+                  <label class="user-name" v-if="item.senderUserInfo === info.userId">我</label>
+                  <label class="msg-time">{{formatDate(item.createTime)}}</label>
                 </div>
-                <div class="msg-conttent">{{item.conttent}}</div>
+                <div class="msg-conttent">{{item.chattingRecord}}</div>
               </div>
             </div>
           </div>
         </div>
-        <div class="chatting">
+        <div class="chatting" v-if="info.userId !== undefined">
           <textarea class="info" name="talk" id="talk" placeholder="请输入内容"></textarea>
           <div class="send">
             <button class="button" type="submit">发送</button>
           </div>
         </div>
-        <div class="userInfo"  tabindex="0" onblur="document.querySelector('.userInfo .pop.active') !== null?document.querySelector('.userInfo .pop.active').classList.toggle('active'):'无事发生'">
-          <span class="iconfont" onclick="document.querySelector('.userInfo .pop').classList.toggle('active')">&#xe6d3;</span>
+        <div class="userInfo" v-if="info.userId !== undefined" tabindex="0" onblur="document.querySelector('.userInfo .pop.active') !== null?document.querySelector('.userInfo .pop.active').classList.toggle('active'):'无事发生'">
+          <span class="iconfont" onclick="document.querySelector('.userInfo .pop').classList.toggle('active')" @click="getUserInfo">&#xe6d3;</span>
           <div class="pop">
             <img class="userImg" :src='userInformation.data.userImg'>
-            <div class="userName">{{userInformation.data.userName}}</div>
-            <div class="userId">编 号: {{userInformation.data.userId}}</div>
+            <div class="userName">{{userInformation.data.name}}</div>
+            <div class="userId">编 号: {{userInformation.data.id}}</div>
             <div class="line"></div>
-            <div class="userPhone">电话号码:&emsp;{{userInformation.data.userPhone}}</div>
-            <div class="userAddres">地&emsp;&emsp;区:&emsp;{{userInformation.data.userAddress}}</div>
+            <div class="userPhone">电话号码:&emsp;{{userInformation.data.phoneNumber}}</div>
+            <div class="userPhone">电子邮件:&emsp;{{userInformation.data.mailbox}}</div>
+            <div class="userAddres">地&emsp;&emsp;区:&emsp;{{userInformation.data.address}}</div>
+            <div class="userDepartment">部&emsp;&emsp;门:&emsp;{{userInformation.data.department}}</div>
           </div>
         </div>
       </div>
@@ -65,91 +69,123 @@
 </template>
 
 <script>
+import {getDate} from '../../common/date.js'
 import errorMessage from '../message.vue'
 export default {
   components: { errorMessage },
   name: 'Chat',
-  mounted: function () {
-    // 请求数据
-    this.info.userId = this.$route.query.userId
-  },
   data: function () {
     return {
+      selfUserId: {
+        id: 1
+      },
       info: {
-        userId: null
+        userId: null,
+        userName: null,
+        userImg: null,
+        chattingRecordPage: 0
       },
-      talkTag: {
-        code: 0,
-        msg: '成功!',
-        total: 3,
-        list: [
-          {
-            userId: '1',
-            userName: '北京客户您好，我想咨询一下资费问题',
-            userImg: '',
-            talkInfo: '您好，我想咨询一下资费问题您好，我想咨询一下资费问题您好，我想咨询一下资费问题您好，我想咨询一下资费问题',
-            talkTime: '17:25',
-            unreadMessage: 5
-          },
-          {
-            userId: '2',
-            userName: '上海客户',
-            userImg: '',
-            talkInfo: '我这边好像出了点问题',
-            talkTime: '昨天',
-            unreadMessage: 0
-          },
-          {
-            userId: '3',
-            userName: '北京客户您好，我想咨询一下资费问题',
-            userImg: '',
-            talkInfo: '我这边好像出了点问题',
-            talkTime: '2021-12-22 17:25',
-            unreadMessage: 144
-          }
-        ]
-      },
-      sessionMsg: {
-        code: 0,
-        msg: '成功!',
-        total: 2,
-        list: [
-          {
-            id: '',
-            name: '北京客户',
-            image: '',
-            conttent: '您好，我想咨询一下资费问题',
-            time: '2020/07/10 17:26'
-          },
-          {
-            id: '',
-            name: '我',
-            image: '',
-            conttent: '您说',
-            time: '2020/07/10 17:25'
-          }
-        ]
-      },
+      talkTag: {},
+      sessionMsg: {},
       userInformation: {
-        code: 0,
-        msg: '成功!',
-        total: 2,
+        code: null,
+        msg: null,
+        total: null,
         data: {
-          userImg: '',
-          userName: '北京客户',
-          userId: '16455',
-          userPhone: '19855143351',
-          userAddress: '山西 太原'
+          userImg: null,
+          name: null,
+          id: null,
+          phoneNumber: null,
+          mailbox: null,
+          address: null,
+          department: null
         }
       }
     }
   },
+  mounted: function () {
+    this.info.userId = this.$route.query.userId
+    this.getSelfUserInfo()
+    this.getChatList()
+  },
   methods: {
-    activeLink (event) {
+    getSelfUserInfo () {
+      // 查询自身信息
+      this.$axios
+        .get('/user/getSelfUserInfo')
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.selfUserInfo = data.data
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    clickTalkBox (event, item) {
+      this.sessionMsg = {}
+      this.info.userId = item.userId
+      this.info.userName = item.userName
+      this.info.userImg = item.userImg
+      this.info.chattingRecordPage = 0
+      if (document.querySelector('.more.hidden') !== null) {
+        document.querySelector('.more').classList.add('hidden')
+      }
       // 给聊天简略信息挂载active
       document.querySelectorAll('.talkbox.active').forEach((item) =>
         item.classList.remove('active'))
       event.currentTarget.className += ' active'
+      this.moreChattingRecord(false)
+    },
+    moreChattingRecord (isMore) {
+      var oldScrollHeight = null
+      var oldScrollTop = null
+      if (isMore) {
+        // 记录滚动条位置
+        oldScrollHeight = document.querySelector('.session-window').scrollHeight
+        oldScrollTop = document.querySelector('.session-window').scrollTop
+      }
+      // 查询更多聊天信息
+      this.$axios
+        .post('/chat/getChattingRecord', {
+          id: this.selfUserInfo.id,
+          chatUserId: this.info.userId,
+          page: this.info.chattingRecordPage
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            if (JSON.stringify(this.sessionMsg) === '{}') {
+              this.sessionMsg = data
+            } else {
+              this.sessionMsg.data = data.data.concat(this.sessionMsg.data)
+            }
+            this.info.chattingRecordPage += 1
+            if (data.data.length < 20 && document.querySelector('.more') !== null) {
+              document.querySelector('.more').classList.add('hidden')
+            } else if (data.data.length === 20 && document.querySelector('.more.hidden') !== null) {
+              document.querySelector('.more.hidden').classList.remove('hidden')
+            }
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+        .finally(() => {
+          if (isMore) {
+            // 设置滚动条位置
+            document.querySelector('.session-window').scrollTop = document.querySelector('.session-window').scrollHeight - oldScrollHeight + oldScrollTop
+          }
+        })
     },
     chattingScrollToBottom () {
       // 移动聊天窗口滚动条至最下
@@ -157,6 +193,67 @@ export default {
         var container = this.$el.querySelector('.session-window')
         container.scrollTop = container.scrollHeight
       })
+    },
+    getChatList () {
+      // 查询聊天列表
+      this.$axios
+        .post('/chat/getChatList', {
+          phoneNumber: this.$cookies.get('cookie_userPhoneNumber'),
+          userId: this.info.userId
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.talkTag = data
+            if (this.info.userId !== null) {
+              for (var i = 0; i < this.talkTag.data.length; i++) {
+                if (this.talkTag.data[i].userId.toString() === this.info.userId) {
+                  this.sessionMsg = {}
+                  this.info.userId = this.talkTag.data[i].userId
+                  this.info.userName = this.talkTag.data[i].userName
+                  this.info.userImg = this.talkTag.data[i].userImg
+                  this.info.chattingRecordPage = 0
+                  this.talkTag.data[i].unreadMessage = 0
+                  this.moreChattingRecord(false)
+                  break
+                }
+              }
+            }
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    getUserInfo () {
+      // 查询联系人详细信息
+      this.$axios
+        .post('/user/getUserInfo', {
+          id: this.info.userId
+        })
+        .then(resp => {
+          let {
+            data
+          } = resp
+          if (data.code === 0) {
+            this.userInformation = data
+          } else {
+            this.showErrorMessage(data.msg)
+          }
+        })
+        .catch(err => {
+          this.showErrorMessage(err)
+        })
+    },
+    formatDate (time) {
+      if (time === null) {
+        return ''
+      }
+      return getDate(time.toString(), 'yyyy-MM-dd hh:mm')
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)
@@ -430,6 +527,10 @@ export default {
   cursor:pointer;
 }
 
+.session-window .more.hidden{
+  display: none;
+}
+
 .session-window .session-msg{
   display: flex;
 }
@@ -543,8 +644,7 @@ export default {
 
 .userInfo .pop {
   display: none;
-  width: 170px;
-  height: 170px;
+  min-width: 200px;
   background-color: #FFFFFF;
   border-radius: 4px;
   z-index: 2;
@@ -552,7 +652,7 @@ export default {
   position: fixed;
   right: 75px;
   box-shadow: 0px 0px 3px #888888;
-  padding: 30px;
+  padding: 20px 30px 20px 30px;
 }
 
 .userInfo .pop.active {

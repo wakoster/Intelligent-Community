@@ -7,17 +7,20 @@ import lombok.Data;
  */
 @Data
 public class ChatListResult {
+    /**
+     * 最后一条聊天记录的id
+     */
     private Long id;
 
     /**
      * 接收方id(receiver)
      */
-    private Long userInfoId;
+    private Long userId;
 
     /**
      * 接收方名字
      */
-    private String name;
+    private String userName;
 
     /**
      * 接收方头像图片

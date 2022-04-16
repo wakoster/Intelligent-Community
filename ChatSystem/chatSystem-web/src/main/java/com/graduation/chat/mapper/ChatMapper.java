@@ -1,5 +1,6 @@
 package com.graduation.chat.mapper;
 
+import com.graduation.chat.dto.ChattingRecordDTO;
 import com.graduation.chat.result.ChatListResult;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -29,4 +30,20 @@ public interface ChatMapper {
      * @return
      */
     Long insertChatList(Long senderUserInfoId,Long receiverUserInfoId);
+
+    /**
+     * 根据用户id和聊天对象id查询聊天记录
+     * @param userId
+     * @param chatUserId
+     * @return
+     */
+    List<ChattingRecordDTO> selectChattingRecord(Long userId, Long chatUserId,Integer rows);
+
+    /**
+     * 设置消息已读
+     * @param userId
+     * @param chatUserId
+     * @return
+     */
+    Integer updateUnreadMessage(Long userId, Long chatUserId);
 }

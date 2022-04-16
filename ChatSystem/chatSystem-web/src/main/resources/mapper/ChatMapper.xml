@@ -3,12 +3,20 @@
 <mapper namespace="com.graduation.chat.mapper.ChatMapper">
     <resultMap id="ChatListResultMap" type="com.graduation.chat.result.ChatListResult">
         <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="receiver_user_info_id" property="userInfoId" />
-        <result column="name" property="name" />
+        <result column="receiver_user_info_id" property="userId" />
+        <result column="name" property="userName" />
         <result column="user_img" property="userImg" />
         <result column="unread_message" property="unreadMessage" />
         <result column="talk_info" property="talkInfo" />
         <result column="talk_time" property="talkTime" />
+    </resultMap>
+    <resultMap id="ChattingRecordResultMap" type="com.graduation.chat.dto.ChattingRecordDTO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="sender_user_info_id" property="senderUserInfo" />
+        <result column="receiver_user_info_id" property="receiverUserInfo" />
+        <result column="chatting_record" property="chattingRecord" />
+        <result column="unread_message" property="unreadMessage" />
     </resultMap>
     <select id="selectChatListToGetChatUserId" resultType="java.lang.Long">
         select user_id from
@@ -30,7 +38,16 @@
             user_info
             on chat_record.receiver_user_info_id = user_info.id
     </select>
+    <select id="selectChattingRecord" resultMap="ChattingRecordResultMap">
+        select * from
+        (select * from chatting_record
+        where (sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}) or (receiver_user_info_id = #{userId} and sender_user_info_id = #{chatUserId})
+        ORDER BY create_time DESC LIMIT #{rows},20) chat_record
+        ORDER BY create_time
+    </select>
     <insert id="insertChatList">
     </insert>
-
+    <update id="updateUnreadMessage">
+        update chatting_record set unread_message = true where sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}
+    </update>
 </mapper>

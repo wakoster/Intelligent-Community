@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         // 设置cookie的持久化时间
         cookie.setMaxAge(12 * 60 * 60);
         // 设置为当前项目下都携带这个cookie
-        cookie.setPath(request.getContextPath());
+        cookie.setPath("/");
         /**
          * 9.向客户端发送cookie
          */

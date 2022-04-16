@@ -26,7 +26,9 @@ public class InterceptorConfig implements WebMvcConfigurer {
         List<String> patterns = new ArrayList<>();
         patterns.add("/error");
 
-        patterns.add("/user/**");
+//        patterns.add("/**");
+//        patterns.add("/chat/**");
+//        patterns.add("/chatSystem/beginChat");
         /**
          * 排除资源文件
          */

@@ -57,33 +57,7 @@ export default {
         code: 0,
         msg: '成功!',
         total: 3,
-        data: [
-          {
-            groupName: '默认分组',
-            list: [
-              {
-                id: '1',
-                name: '北京客户您好，我想咨询一下资费问题',
-                userImg: ''
-              },
-              {
-                id: '2',
-                name: '上海客户',
-                userImg: ''
-              }
-            ]
-          },
-          {
-            groupName: '朋友',
-            list: [
-              {
-                id: '1',
-                name: 'xxx',
-                userImg: ''
-              }
-            ]
-          }
-        ]
+        data: []
       },
       userInfo: {}
     }
@@ -100,7 +74,7 @@ export default {
       this.userInfo = item
     },
     sendMessage (userId) {
-      // 在后端解决跳转和带参问题
+      this.$router.push('/chatSystem/chat?userId=' + userId)
     },
     selectUserList (name) {
       // 查询联系人列表

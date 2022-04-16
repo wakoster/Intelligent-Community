@@ -2,6 +2,9 @@ package com.graduation.chat.service;
 
 import com.graduation.chat.result.BaseResult;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public interface UserService {
     /**
      * 更新密码
@@ -36,4 +39,17 @@ public interface UserService {
      * @return
      */
     BaseResult selectUserList(String phoneNumber,String name);
+
+    /**
+     * 查询用户列表
+     * @param id
+     * @return
+     */
+    BaseResult selectUserInfoById(Long id);
+
+    /**
+     * 查询自身id
+     * @return
+     */
+    BaseResult selectSelfUserInfo(HttpServletRequest request, HttpServletResponse response);
 }
