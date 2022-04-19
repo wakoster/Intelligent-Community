@@ -18,4 +18,12 @@ public interface ChatService {
      * @return
      */
     BaseResult selectChattingRecord(Long userId, Long chatUserId,Integer page);
+
+    /**
+     * 查询聊天列表
+     * @param userId
+     * @param chatUserId
+     * @return
+     */
+    BaseResult updateReadMessage(Long userId, Long chatUserId);
 }

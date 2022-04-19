@@ -180,18 +180,17 @@ public class UserServiceImpl implements UserService {
         /**
          * 1.获得cookie
          */
-//        Cookie[] cookies = request.getCookies();
-//        /**
-//         * 2.获取cookie里面的电话号码
-//         */
-//        String cookie_userPhoneNumber = null;
-//        for (Cookie item : cookies) {
-//            if ("cookie_userPhoneNumber".equals(item.getName())) {
-//                cookie_userPhoneNumber = item.getValue();
-//                break;
-//            }
-//        }
-        String cookie_userPhoneNumber = "19855143351";
+        Cookie[] cookies = request.getCookies();
+        /**
+         * 2.获取cookie里面的电话号码
+         */
+        String cookie_userPhoneNumber = null;
+        for (Cookie item : cookies) {
+            if ("cookie_userPhoneNumber".equals(item.getName())) {
+                cookie_userPhoneNumber = item.getValue();
+                break;
+            }
+        }
         /**
          * 3.查询用户
          */

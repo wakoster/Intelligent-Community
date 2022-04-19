@@ -24,14 +24,6 @@ public interface ChatMapper {
     ChatListResult selectChatList(Long userId,Long chatUserId);
 
     /**
-     * 创建聊天记录列表
-     * @param senderUserInfoId
-     * @param receiverUserInfoId
-     * @return
-     */
-    Long insertChatList(Long senderUserInfoId,Long receiverUserInfoId);
-
-    /**
      * 根据用户id和聊天对象id查询聊天记录
      * @param userId
      * @param chatUserId
@@ -46,4 +38,11 @@ public interface ChatMapper {
      * @return
      */
     Integer updateUnreadMessage(Long userId, Long chatUserId);
+
+    /**
+     * 插入聊天记录
+     * @param chattingRecordDTO
+     * @return
+     */
+    Integer insertChattingRecord(ChattingRecordDTO chattingRecordDTO);
 }

@@ -29,13 +29,13 @@
         <div class="session-window">
           <div class="more hidden" @click="moreChattingRecord(true)">查看更多消息</div>
           <div v-for="item in sessionMsg.data" :key="item.userId">
-            <div class="session-msg"  :class="{receiver: item.senderUserInfo === info.userId}">
-              <img class="userImg" :src='info.userImg' v-if="item.senderUserInfo !== info.userId">
-              <img class="userImg" :src='selfUserInfo.userImg' v-if="item.senderUserInfo === info.userId">
+            <div class="session-msg"  :class="{receiver: item.senderUserInfo !== info.userId}">
+              <img class="userImg" :src='info.userImg' v-if="item.senderUserInfo === info.userId">
+              <img class="userImg" :src='selfUserInfo.userImg' v-if="item.senderUserInfo !== info.userId">
               <div class="msg-detail">
                 <div class="msg-title">
-                  <label class="user-name" v-if="item.senderUserInfo !== info.userId">{{info.userName}}</label>
-                  <label class="user-name" v-if="item.senderUserInfo === info.userId">我</label>
+                  <label class="user-name" v-if="item.senderUserInfo === info.userId">{{info.userName}}</label>
+                  <label class="user-name" v-if="item.senderUserInfo !== info.userId">我</label>
                   <label class="msg-time">{{formatDate(item.createTime)}}</label>
                 </div>
                 <div class="msg-conttent">{{item.chattingRecord}}</div>
@@ -44,9 +44,9 @@
           </div>
         </div>
         <div class="chatting" v-if="info.userId !== undefined">
-          <textarea class="info" name="talk" id="talk" placeholder="请输入内容"></textarea>
+          <textarea class="info" name="talk" id="talk" placeholder="请输入内容" v-model="chattingRecord.chattingRecord"></textarea>
           <div class="send">
-            <button class="button" type="submit">发送</button>
+            <button class="button" type="submit" @click="webSocketSend('111')">发送</button>
           </div>
         </div>
         <div class="userInfo" v-if="info.userId !== undefined" tabindex="0" onblur="document.querySelector('.userInfo .pop.active') !== null?document.querySelector('.userInfo .pop.active').classList.toggle('active'):'无事发生'">
@@ -76,7 +76,14 @@ export default {
   name: 'Chat',
   data: function () {
     return {
-      selfUserId: {
+      chattingRecord: {
+        createTime: null,
+        senderUserInfo: null,
+        receiverUserInfo: null,
+        chattingRecord: null
+      },
+      socket: '',
+      selfUserInfo: {
         id: 1
       },
       info: {
@@ -119,6 +126,7 @@ export default {
           } = resp
           if (data.code === 0) {
             this.selfUserInfo = data.data
+            this.webSocketInit()
           } else {
             this.showErrorMessage(data.msg)
           }
@@ -172,6 +180,11 @@ export default {
               document.querySelector('.more').classList.add('hidden')
             } else if (data.data.length === 20 && document.querySelector('.more.hidden') !== null) {
               document.querySelector('.more.hidden').classList.remove('hidden')
+            }
+            if (!isMore) {
+              this.$nextTick(() => {
+                document.querySelector('.session-window').scrollTop = document.querySelector('.session-window').scrollHeight
+              })
             }
           } else {
             this.showErrorMessage(data.msg)
@@ -257,6 +270,65 @@ export default {
     },
     showErrorMessage (errorMessage) {
       this.$refs.errorMessage.setErrorMessage(errorMessage)
+    },
+    showInfoMessage (infoMessage) {
+      this.$refs.errorMessage.setInfoMessage(infoMessage)
+    },
+    webSocketInit () {
+      if (typeof (WebSocket) === 'undefined') {
+        alert('您的浏览器不支持socket')
+      } else {
+        var path = 'ws://localhost:1004/websocket/' + this.selfUserInfo.id// 请求路径
+        // 实例化socket
+        this.socket = new WebSocket(path)
+        // 监听socket连接
+        this.socket.onopen = this.webSocketOpen
+        // 监听socket错误信息
+        this.socket.onerror = this.webSocketError
+        // 监听socket消息
+        this.socket.onmessage = this.webSocketGetMessage
+        // 监听socket关闭
+        this.socket.onclose = this.webSocketClose
+      }
+    },
+    webSocketOpen () {
+      this.showInfoMessage('通讯连接成功')
+      console.log('通讯连接成功')
+    },
+    webSocketError () {
+      this.showErrorMessage('通讯连接异常')
+    },
+    webSocketGetMessage (msg) {
+      var chattingRecord = JSON.parse(msg.data)
+      if (chattingRecord.senderUserInfo === this.info.userId || chattingRecord.receiverUserInfo === this.info.userId) {
+        this.sessionMsg.data.push(chattingRecord)
+        this.$nextTick(() => {
+          document.querySelector('.session-window').scrollTop = document.querySelector('.session-window').scrollHeight
+        })
+        // 设置已读
+        this.$axios
+          .post('/chat/setReadMessage', {
+            id: this.selfUserInfo.id,
+            chatUserId: this.info.userId
+          })
+          .catch(err => {
+            this.showErrorMessage(err)
+          })
+      } else {
+        this.getChatList()
+      }
+    },
+    webSocketSend () {
+      if (this.chattingRecord.chattingRecord !== undefined && this.chattingRecord.chattingRecord !== null && this.chattingRecord.chattingRecord !== '') {
+        this.chattingRecord.createTime = parseInt(new Date().getTime() / 1000)
+        this.chattingRecord.senderUserInfo = this.selfUserInfo.id
+        this.chattingRecord.receiverUserInfo = this.info.userId
+        this.socket.send(JSON.stringify(this.chattingRecord))
+        this.chattingRecord.chattingRecord = null
+      }
+    },
+    webSocketClose () {
+      this.showErrorMessage('通讯连接异常关闭')
     }
   }
 }

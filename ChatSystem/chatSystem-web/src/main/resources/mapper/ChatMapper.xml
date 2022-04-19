@@ -32,8 +32,8 @@
                 (select id,chatting_record,create_time,IF(sender_user_info_id = #{userId},receiver_user_info_id,sender_user_info_id) as receiver_user_info_id from chatting_record
                     where (sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}) or (sender_user_info_id = #{chatUserId} and receiver_user_info_id = #{userId}) ORDER BY create_time DESC LIMIT 1) record_info
                 LEFT JOIN
-                (select COUNT(unread_message) as unread_message,receiver_user_info_id from chatting_record where unread_message = FALSE and sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}) unread_message
-                on record_info.receiver_user_info_id = unread_message.receiver_user_info_id) chat_record
+                (select COUNT(unread_message) as unread_message,sender_user_info_id from chatting_record where unread_message = FALSE and sender_user_info_id = #{chatUserId} and receiver_user_info_id = #{userId}) unread_message
+                on record_info.receiver_user_info_id = unread_message.sender_user_info_id) chat_record
             LEFT JOIN
             user_info
             on chat_record.receiver_user_info_id = user_info.id
@@ -45,9 +45,12 @@
         ORDER BY create_time DESC LIMIT #{rows},20) chat_record
         ORDER BY create_time
     </select>
-    <insert id="insertChatList">
-    </insert>
     <update id="updateUnreadMessage">
-        update chatting_record set unread_message = true where sender_user_info_id = #{userId} and receiver_user_info_id = #{chatUserId}
+        update chatting_record set unread_message = true where sender_user_info_id = #{chatUserId} and receiver_user_info_id = #{userId}
     </update>
+    <insert id="insertChattingRecord"  useGeneratedKeys="true" keyProperty="id">
+        insert into chatting_record(
+            create_time, sender_user_info_id, receiver_user_info_id, chatting_record,unread_message)
+        values (#{createTime},#{senderUserInfo},#{receiverUserInfo},#{chattingRecord},false)
+    </insert>
 </mapper>

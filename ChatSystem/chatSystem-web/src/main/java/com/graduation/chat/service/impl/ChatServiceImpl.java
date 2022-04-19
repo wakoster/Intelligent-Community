@@ -104,4 +104,14 @@ public class ChatServiceImpl implements ChatService {
         }
         return BaseResult.SUCCESS(chattingRecordDTOList);
     }
+
+    @Override
+    public BaseResult updateReadMessage(Long userId, Long chatUserId) {
+        try {
+            chatMapper.updateUnreadMessage(userId,chatUserId);
+        } catch(Exception e){
+            return BaseResult.ERROR((long) -1,e.getMessage(),null);
+        }
+        return BaseResult.SUCCESS(null);
+    }
 }

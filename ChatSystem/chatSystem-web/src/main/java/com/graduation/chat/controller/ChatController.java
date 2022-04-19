@@ -34,4 +34,14 @@ public class ChatController {
     public BaseResult getChattingRecord(@RequestBody HashMap<String,String> params){
         return chatService.selectChattingRecord(Long.valueOf(params.get("id")),Long.valueOf(params.get("chatUserId")),Integer.valueOf(params.get("page")));
     }
+
+    /**
+     * 获取聊天记录
+     * @return
+     */
+    @RequestMapping(value = "/setReadMessage",method = RequestMethod.POST)
+    @ResponseBody
+    public void setReadMessage(@RequestBody HashMap<String,String> params){
+        chatService.updateReadMessage(Long.valueOf(params.get("id")),Long.valueOf(params.get("chatUserId")));
+    }
 }
